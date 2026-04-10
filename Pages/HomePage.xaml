@@ -71,6 +71,12 @@
                     <TextBlock Text="{x:Static resources:Strings.PageUrlEncode}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,8,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                 </StackPanel>
             </Button>
+            <Button x:Name="BtnEscape" Click="BtnEscape_Click" Style="{StaticResource CardButtonStyle}" Margin="8">
+                <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf071;" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
+                    <TextBlock Text="{x:Static resources:Strings.PageEscape}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,8,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
+                </StackPanel>
+            </Button>
         </UniformGrid>
     </Grid>
 </Page>

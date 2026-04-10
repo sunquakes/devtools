@@ -105,6 +105,9 @@ namespace DevTools.Resources
         public static string PageUrlEncode => Get("PageUrlEncode");
         public static string URLEncode => Get("URLEncode");
         public static string URLDecode => Get("URLDecode");
+        public static string PageEscape => Get("PageEscape");
+        public static string Escape => Get("Escape");
+        public static string Unescape => Get("Unescape");
         public static string Input => Get("Input");
         public static string Output => Get("Output");
         public static string EncodeFailed => Get("EncodeFailed");

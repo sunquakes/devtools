@@ -252,24 +252,34 @@ namespace DevTools.Pages
         {
             try
             {
+                if (string.IsNullOrEmpty(targetPath))
+                {
+                    throw new InvalidOperationException("应用程序路径为空");
+                }
+
                 var shellType = Type.GetTypeFromProgID("WScript.Shell");
                 if (shellType == null)
                 {
-                    MessageBox.Show(Strings.Error, Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    throw new InvalidOperationException("无法创建 WScript.Shell 对象");
                 }
                 
                 dynamic shell = Activator.CreateInstance(shellType)!;
                 if (shell == null)
                 {
-                    MessageBox.Show(Strings.Error, Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    throw new InvalidOperationException("WScript.Shell 实例创建失败");
                 }
                 
                 var shortcut = shell.CreateShortcut(shortcutPath);
                 shortcut.TargetPath = targetPath;
                 shortcut.Description = description;
+                shortcut.WorkingDirectory = Path.GetDirectoryName(targetPath);
+                shortcut.WindowStyle = 1;
                 shortcut.Save();
+                
+                if (!File.Exists(shortcutPath))
+                {
+                    throw new InvalidOperationException("快捷方式文件创建失败");
+                }
             }
             catch (Exception ex)
             {

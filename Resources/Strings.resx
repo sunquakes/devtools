@@ -319,4 +319,13 @@
   <data name="OutputEmpty" xml:space="preserve">
     <value>输出为空</value>
   </data>
+  <data name="PageEscape" xml:space="preserve">
+    <value>字符串转义</value>
+  </data>
+  <data name="Escape" xml:space="preserve">
+    <value>转义</value>
+  </data>
+  <data name="Unescape" xml:space="preserve">
+    <value>反转义</value>
+  </data>
 </root>

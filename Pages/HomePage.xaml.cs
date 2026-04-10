@@ -50,6 +50,11 @@ namespace DevTools.Pages
             NavigationService?.Navigate(new UrlEncodePage());
         }
 
+        private void BtnEscape_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new EscapePage());
+        }
+
         private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
             NavigationService?.Navigate(new SettingsPage());

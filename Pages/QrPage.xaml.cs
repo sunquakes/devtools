@@ -166,6 +166,7 @@ namespace DevTools.Pages
 
                 entry.TimestampString = entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
                 _logs.Insert(0, entry);
+                InputText.Text = string.Empty;
             }
             catch (Exception ex)
             {
