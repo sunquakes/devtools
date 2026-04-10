@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [1.3.0] - 2026-04-10
+
+### Added
+- String Escape/Unescape functionality
+  - Escape special characters in strings
+  - Unescape escaped strings
+  - Support for common escape sequences (\n, \t, \r, etc.)
+- JSON formatter improvements
+  - Double-click to select only the value (excluding key and colon)
+  - Right-click context menu now copies selected text instead of full line
+  - Auto word wrap for long JSON values
+  - No horizontal scrolling needed
+
+### Changed
+- QR Code and Barcode pages
+  - Clear input field after generating new codes
+- Optimized shortcut creation, working directory and window style settings
+
+---
+
 ## [1.2.0] - 2025-03-20
 
 ### Added

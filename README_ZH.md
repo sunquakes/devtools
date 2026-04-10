@@ -26,6 +26,7 @@
 - **Base64 ↔ 图片** - Base64 字符串与图片互转
 - **JSON 格式化** - 格式化、展开、折叠 JSON 数据
 - **URL 编码/解码** - 对 URL 字符串进行编码和解码
+- **字符串转义/反转义** - 转义和反转义特殊字符
 - **手写签名** - 绘制签名并转换为 Base64 或保存为图片
 
 ## 安装
@@ -80,6 +81,7 @@ DevTools/
 │   ├── ImageToBase64Page.xaml
 │   ├── JsonFormatPage.xaml
 │   ├── UrlEncodePage.xaml
+│   ├── EscapePage.xaml
 │   └── SignaturePage.xaml
 ├── Resources/          # 资源（图片、字符串、字体）
 │   ├── Images/

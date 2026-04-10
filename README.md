@@ -26,6 +26,7 @@
 - **Base64 ↔ Image** - Convert between Base64 strings and images
 - **JSON Formatter** - Format, expand, and collapse JSON data
 - **URL Encode/Decode** - Encode and decode URL strings
+- **String Escape/Unescape** - Escape and unescape special characters
 - **Handwritten Signature** - Draw signatures and convert to Base64 or save as images
 
 ## Installation
@@ -80,6 +81,7 @@ DevTools/
 │   ├── ImageToBase64Page.xaml
 │   ├── JsonFormatPage.xaml
 │   ├── UrlEncodePage.xaml
+│   ├── EscapePage.xaml
 │   └── SignaturePage.xaml
 ├── Resources/          # Resources (images, strings, fonts)
 │   ├── Images/
