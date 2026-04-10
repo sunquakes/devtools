@@ -334,7 +334,8 @@ namespace DevTools.Pages
                 case JsonValueKind.String:
                     {
                         elementCount++;
-                        var text = $"{name}: \"{el.GetString()}\"";
+                        var stringValue = el.GetString() ?? string.Empty;
+                        var text = $"{name}: \"{stringValue}\"";
                         var tb = new TextBox
                         {
                             Text = text,
@@ -354,13 +355,14 @@ namespace DevTools.Pages
                         {
                             try
                             {
-                                var colonIndex = text.IndexOf(':');
+                                var currentText = textBox.Text;
+                                var colonIndex = currentText.IndexOf(':');
                                 if (colonIndex >= 0)
                                 {
-                                    var firstQuote = text.IndexOf('"', colonIndex);
+                                    var firstQuote = currentText.IndexOf('"', colonIndex);
                                     if (firstQuote >= 0)
                                     {
-                                        var lastQuote = text.LastIndexOf('"');
+                                        var lastQuote = currentText.LastIndexOf('"');
                                         if (lastQuote > firstQuote)
                                         {
                                             textBox.Select(firstQuote + 1, lastQuote - firstQuote - 1);
@@ -389,6 +391,7 @@ namespace DevTools.Pages
                             IsReadOnly = true,
                             BorderThickness = new Thickness(0),
                             Background = System.Windows.Media.Brushes.Transparent,
+                            TextWrapping = TextWrapping.Wrap,
                             Margin = new Thickness(4,2,0,2),
                             FontFamily = new System.Windows.Media.FontFamily("Consolas"),
                             CaretBrush = System.Windows.Media.Brushes.Transparent,
@@ -401,11 +404,17 @@ namespace DevTools.Pages
                         {
                             try
                             {
-                                var colonIndex = text.IndexOf(':');
-                                if (colonIndex >= 0 && colonIndex < text.Length - 1)
+                                var currentText = textBox.Text;
+                                var colonIndex = currentText.IndexOf(':');
+                                if (colonIndex >= 0 && colonIndex < currentText.Length - 1)
                                 {
                                     var valueStart = colonIndex + 1;
-                                    textBox.Select(valueStart, text.Length - valueStart);
+                                    // Trim leading spaces
+                                    while (valueStart < currentText.Length && currentText[valueStart] == ' ')
+                                    {
+                                        valueStart++;
+                                    }
+                                    textBox.Select(valueStart, currentText.Length - valueStart);
                                 }
                             }
                             catch
@@ -426,6 +435,7 @@ namespace DevTools.Pages
                             IsReadOnly = true,
                             BorderThickness = new Thickness(0),
                             Background = System.Windows.Media.Brushes.Transparent,
+                            TextWrapping = TextWrapping.Wrap,
                             Margin = new Thickness(4,2,0,2),
                             FontFamily = new System.Windows.Media.FontFamily("Consolas"),
                             CaretBrush = System.Windows.Media.Brushes.Transparent,
@@ -438,11 +448,17 @@ namespace DevTools.Pages
                         {
                             try
                             {
-                                var colonIndex = text.IndexOf(':');
-                                if (colonIndex >= 0 && colonIndex < text.Length - 1)
+                                var currentText = textBox2.Text;
+                                var colonIndex = currentText.IndexOf(':');
+                                if (colonIndex >= 0 && colonIndex < currentText.Length - 1)
                                 {
                                     var valueStart = colonIndex + 1;
-                                    textBox2.Select(valueStart, text.Length - valueStart);
+                                    // Trim leading spaces
+                                    while (valueStart < currentText.Length && currentText[valueStart] == ' ')
+                                    {
+                                        valueStart++;
+                                    }
+                                    textBox2.Select(valueStart, currentText.Length - valueStart);
                                 }
                             }
                             catch
@@ -474,7 +490,11 @@ namespace DevTools.Pages
         {
             var contextMenu = new ContextMenu();
             var copyItem = new MenuItem { Header = Strings.Copy };
-            copyItem.Click += (s, e) => ClipboardHelper.CopyWithFeedback(tb.Text, null);
+            copyItem.Click += (s, e) =>
+            {
+                var textToCopy = !string.IsNullOrEmpty(tb.SelectedText) ? tb.SelectedText : tb.Text;
+                ClipboardHelper.CopyWithFeedback(textToCopy, null);
+            };
             contextMenu.Items.Add(copyItem);
             tb.ContextMenu = contextMenu;
         }
