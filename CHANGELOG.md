@@ -4,6 +4,60 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.0] - 2026-04-12
+
+### Added
+- **RESTful API Server** - Complete HTTP API for all tool functions
+  - 13 API endpoints for programmatic access
+  - AI agent integration support
+  - CORS support for browser-based applications
+  - Configurable port (default: 5000)
+  - Enable/disable option in App.config
+- **API Documentation** - Comprehensive API documentation
+  - Complete endpoint documentation (README.md)
+  - Usage examples in multiple languages (EXAMPLES.md)
+  - Quick reference guide (QUICK_REFERENCE.md)
+  - Project structure documentation (PROJECT_STRUCTURE.md)
+  - Refactoring summary (REFACTORING_SUMMARY.md)
+- **API Test Script** - PowerShell script to test all API endpoints
+- **API Service Layer** - Modular service architecture
+  - IMd5ApiService - MD5 hash computation
+  - IJsonApiService - JSON formatting and validation
+  - IUrlEncodeApiService - URL encoding/decoding
+  - IEscapeApiService - String escaping/unesaping
+  - IBase64ApiService - Base64 encoding/decoding
+  - IQrCodeApiService - QR code generation
+  - IBarcodeApiService - Barcode generation (11 formats)
+  - ISignatureApiService - Signature generation
+- **HTTP Server** - Lightweight HTTP server based on HttpListener
+  - Asynchronous request processing
+  - Thread-safe operation
+  - Unified response format
+  - Error handling with error codes
+- **Configuration Options** - App.config settings for API server
+  - EnableApiServer - Enable/disable API server
+  - ApiServerPort - Configure server port
+
+### Changed
+- **README.md** - Updated with API documentation section
+- **Project Structure** - Added API directory and documentation
+- **MainWindow** - Integrated API server lifecycle management
+- **Documentation Language** - All documentation now in English
+
+### Technical Details
+- **Architecture** - Service-oriented architecture with clear separation
+- **Design Patterns** - Singleton, Dependency Injection, Strategy Pattern
+- **Security** - Localhost-only binding, configurable port
+- **Performance** - Asynchronous processing, low memory footprint
+
+### Documentation
+- All API documentation in English
+- Code examples in Python, JavaScript, cURL, and PowerShell
+- Quick reference for all endpoints
+- Integration examples for AI agents
+
+---
+
 ## [1.3.0] - 2026-04-10
 
 ### Added
@@ -98,46 +152,14 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Renamed application to "开发者工具" (Chinese) / "DevTools" (English)
-- Updated all namespaces from development_kits to DevTools
-- Replaced conversion button icons with more appropriate ones
-- Removed home page title and centered cards vertically
-- Translated all Chinese comments to English
-- Localized all message box prompts using i18n
-
-### Fixed
-- JSON formatter double-click selection now excludes quotes for string values
-- JSON formatter arrow direction syncs with expand/collapse state
-- JSON formatter expand/collapse buttons work recursively
-- MD5 copy button error when clicking quickly
-- Window title now displays correct localized name
-- Missing application icon on exe files
-- Windows 11 compatibility warning for installer
-- Preview window button text visibility issues
-- Close dialog button styling and text color
-
-### Improved
-- Better button styling across all dialogs
-- Improved clipboard operations with retry logic
-- Better error handling for image operations
 
 ---
 
-## [1.0.0] - 2025-03-08
+## Version History
 
-### Added
-- MD5 hash calculation tool (32-bit and 16-bit, uppercase and lowercase)
-- Barcode generator (CODE 128 format)
-- QR Code generator
-- Base64 to Image decoder
-- Image to Base64 encoder
-- JSON formatter with expand/collapse functionality
-- Multi-language support (Chinese and English)
-- Dark theme UI
-
-### Features
-- Double-click to select JSON property values
-- Copy to clipboard with feedback
-- Save generated barcodes and QR codes
-- Toggle visibility for generated images
-
----
+- **2.0.0** - RESTful API integration (Current)
+- **1.3.0** - String escape/unescape, JSON improvements
+- **1.2.0** - State persistence for QR/Barcode
+- **1.1.0** - Single instance, signature feature
+- **1.0.2** - Bug fixes
+- **1.0.1** - Initial release with full features

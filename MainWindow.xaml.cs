@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using DevTools.API;
 using DevTools.Properties;
 using DevTools.Resources;
 using Application = System.Windows.Application;
@@ -37,6 +38,7 @@ namespace DevTools
         private bool _trayShowHide = false;
         private int _hotkeyId = 9000;
         private string? _currentHotkey;
+        private bool _apiServerEnabled;
 
         public MainWindow()
         {
@@ -47,6 +49,7 @@ namespace DevTools
             LoadSettings();
             InitializeNotifyIcon();
             RegisterCurrentHotkey();
+            InitializeApiServer();
         }
 
         private void LoadSettings()
@@ -55,10 +58,14 @@ namespace DevTools
             {
                 var minimizeSetting = ConfigurationManager.AppSettings["MinimizeToTray"];
                 _minimizeToTray = minimizeSetting == "true";
+                
+                var apiServerSetting = ConfigurationManager.AppSettings["EnableApiServer"];
+                _apiServerEnabled = apiServerSetting == "true";
             }
             catch
             {
                 _minimizeToTray = false;
+                _apiServerEnabled = false;
             }
         }
 
@@ -75,6 +82,16 @@ namespace DevTools
                 {
                     config.AppSettings.Settings["MinimizeToTray"].Value = _minimizeToTray.ToString().ToLower();
                 }
+                
+                if (config.AppSettings.Settings["EnableApiServer"] == null)
+                {
+                    config.AppSettings.Settings.Add("EnableApiServer", _apiServerEnabled.ToString().ToLower());
+                }
+                else
+                {
+                    config.AppSettings.Settings["EnableApiServer"].Value = _apiServerEnabled.ToString().ToLower();
+                }
+                
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection("appSettings");
             }
@@ -83,7 +100,7 @@ namespace DevTools
             }
         }
 
-        private void InitializeNotifyIcon()
+        private async void InitializeNotifyIcon()
         {
             Icon? icon = LoadIcon();
 
@@ -110,6 +127,52 @@ namespace DevTools
             contextMenu.Items.Add(showItem);
             contextMenu.Items.Add(exitItem);
             _notifyIcon.ContextMenuStrip = contextMenu;
+            
+            if (_apiServerEnabled)
+            {
+                _notifyIcon.ShowBalloonTip(3000, "Toolbox", "API Server starting...", ToolTipIcon.Info);
+            }
+        }
+
+        private async void InitializeApiServer()
+        {
+            if (!_apiServerEnabled)
+            {
+                return;
+            }
+
+            try
+            {
+                var port = 5000;
+                var portSetting = ConfigurationManager.AppSettings["ApiServerPort"];
+                if (!string.IsNullOrEmpty(portSetting) && int.TryParse(portSetting, out var parsedPort))
+                {
+                    port = parsedPort;
+                }
+
+                var result = await ApiManager.Instance.InitializeAsync(port);
+                if (result)
+                {
+                    if (_notifyIcon != null)
+                    {
+                        _notifyIcon.ShowBalloonTip(3000, "Toolbox", $"API Server started on port {port}", ToolTipIcon.Info);
+                    }
+                }
+                else
+                {
+                    if (_notifyIcon != null)
+                    {
+                        _notifyIcon.ShowBalloonTip(3000, "Toolbox", "Failed to start API Server", ToolTipIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_notifyIcon != null)
+                {
+                    _notifyIcon.ShowBalloonTip(3000, "Toolbox", $"API Server error: {ex.Message}", ToolTipIcon.Error);
+                }
+            }
         }
 
         public void UpdateTrayShowHide(bool enable)
@@ -298,6 +361,7 @@ namespace DevTools
         private void ExitApplication()
         {
             _isClosing = true;
+            ApiManager.Instance.Shutdown();
             _notifyIcon?.Dispose();
             Application.Current.Shutdown();
         }
