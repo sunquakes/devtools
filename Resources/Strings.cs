@@ -114,5 +114,6 @@ namespace DevTools.Resources
         public static string DecodeFailed => Get("DecodeFailed");
         public static string InputEmpty => Get("InputEmpty");
         public static string OutputEmpty => Get("OutputEmpty");
+        public static string AppPathEmptyOrNotFound => Get("AppPathEmptyOrNotFound");
     }
 }

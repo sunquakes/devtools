@@ -370,4 +370,7 @@
   <data name="Unescape" xml:space="preserve">
     <value>Unescape</value>
   </data>
+  <data name="AppPathEmptyOrNotFound" xml:space="preserve">
+    <value>Application path is empty or file not found</value>
+  </data>
 </root>

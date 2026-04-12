@@ -198,6 +198,18 @@ namespace DevTools.Pages
 
                 if (enable)
                 {
+                    if (string.IsNullOrEmpty(appPath))
+                    {
+                        appPath = System.AppDomain.CurrentDomain.BaseDirectory + AppName;
+                    }
+                    
+                    if (string.IsNullOrEmpty(appPath) || !File.Exists(appPath))
+                    {
+                        MessageBox.Show(Strings.AppPathEmptyOrNotFound, Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                        AutoStartCheckBox.IsChecked = false;
+                        return;
+                    }
+                    
                     CreateShortcut(shortcutPath, appPath, Strings.PageSettings);
                 }
                 else

@@ -328,4 +328,7 @@
   <data name="Unescape" xml:space="preserve">
     <value>反转义</value>
   </data>
+  <data name="AppPathEmptyOrNotFound" xml:space="preserve">
+    <value>应用程序路径配置为空或文件不存在</value>
+  </data>
 </root>
