@@ -8,7 +8,10 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Controls.Primitives;
 using DevTools.Helpers;
 using DevTools.Resources;
 using ZXing;
@@ -16,12 +19,23 @@ using ZXing.Common;
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Point = System.Windows.Point;
+using Size = System.Windows.Size;
+using Color = System.Windows.Media.Color;
+using Path = System.IO.Path;
+using Mouse = System.Windows.Input.Mouse;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace DevTools.Pages
 {
     public partial class QrPage : Page
     {
         private readonly ObservableCollection<QrLogEntry> _logs = new();
+        private QrLogEntry? _draggedItem;
+        private Point _startPoint;
+        private bool _isDragging;
+        private int _draggedIndex = -1;
+        private Border? _dragPreview;
 
         public QrPage()
         {
@@ -252,7 +266,7 @@ namespace DevTools.Pages
             }
             finally
             {
-                NativeMethods.DeleteObject(handle);
+                DeleteObject(handle);
             }
         }
 
@@ -261,6 +275,136 @@ namespace DevTools.Pages
             foreach (var l in _logs) { try { l.Bitmap?.Dispose(); } catch { } }
             _logs.Clear();
         }
+
+        private void DragHandle_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is QrLogEntry entry)
+            {
+                _draggedItem = entry;
+                _draggedIndex = _logs.IndexOf(entry);
+                _startPoint = e.GetPosition(null);
+                Mouse.Capture(border);
+                e.Handled = true;
+            }
+        }
+
+        private void DragHandle_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (_draggedItem == null || e.LeftButton != System.Windows.Input.MouseButtonState.Pressed)
+            {
+                if (_draggedItem != null && e.LeftButton != System.Windows.Input.MouseButtonState.Pressed)
+                {
+                    CleanupDrag();
+                }
+                return;
+            }
+
+            var currentPoint = e.GetPosition(null);
+            var diff = currentPoint - _startPoint;
+
+            if (!_isDragging && (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance || 
+                                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
+            {
+                _isDragging = true;
+                
+                _dragPreview = new Border
+                {
+                    Background = new SolidColorBrush(Color.FromArgb(230, 45, 45, 45)),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(80, 80, 80)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(12, 8, 12, 8),
+                    Child = new TextBlock
+                    {
+                        Text = _draggedItem.Text ?? "",
+                        Foreground = Brushes.White,
+                        FontSize = 13,
+                        MaxWidth = 300,
+                        TextTrimming = TextTrimming.CharacterEllipsis
+                    }
+                };
+                
+                DragOverlay.Children.Add(_dragPreview);
+            }
+            
+            if (_isDragging && _dragPreview != null)
+            {
+                var pos = e.GetPosition(DragOverlay);
+                Canvas.SetLeft(_dragPreview, pos.X + 10);
+                Canvas.SetTop(_dragPreview, pos.Y + 10);
+            }
+        }
+
+        private void DragHandle_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (_isDragging && _draggedItem != null && _draggedIndex >= 0)
+            {
+                // 确保布局已更新
+                LogsList.UpdateLayout();
+                
+                var mousePos = e.GetPosition(LogsList);
+                var targetItem = FindItemAtPosition(mousePos);
+                
+                if (targetItem != null && targetItem != _draggedItem)
+                {
+                    var targetIndex = _logs.IndexOf(targetItem);
+                    if (targetIndex >= 0 && _draggedIndex != targetIndex)
+                    {
+                        var item = _logs[_draggedIndex];
+                        _logs.RemoveAt(_draggedIndex);
+                        _logs.Insert(targetIndex, item);
+                        
+                        // 交换后再次更新布局
+                        LogsList.UpdateLayout();
+                    }
+                }
+            }
+            
+            CleanupDrag();
+        }
+
+        private void CleanupDrag()
+        {
+            Mouse.Capture(null);
+            
+            if (_dragPreview != null)
+            {
+                DragOverlay.Children.Remove(_dragPreview);
+                _dragPreview = null;
+            }
+            
+            _isDragging = false;
+            _draggedItem = null;
+            _draggedIndex = -1;
+        }
+
+        private QrLogEntry? FindItemAtPosition(Point position)
+        {
+            if (LogsList == null) return null;
+            
+            // 遍历所有项，查找鼠标位置下方的项
+            for (int i = 0; i < _logs.Count; i++)
+            {
+                var container = LogsList.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement;
+                if (container == null) continue;
+                
+                container.UpdateLayout();
+                
+                var itemPos = container.TranslatePoint(new Point(0, 0), LogsList);
+                var itemRect = new Rect(itemPos.X, itemPos.Y, container.ActualWidth, container.ActualHeight);
+                
+                if (itemRect.Contains(position))
+                {
+                    return _logs[i];
+                }
+            }
+            
+            return null;
+        }
+
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool DeleteObject(IntPtr hObject);
     }
 
     internal class QrLogEntry : INotifyPropertyChanged
