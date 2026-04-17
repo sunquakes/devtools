@@ -98,6 +98,16 @@ namespace DevTools.Resources
         public static string ClickToPreview => Get("ClickToPreview");
         public static string NoImageToPreview => Get("NoImageToPreview");
         public static string ImagePreview => Get("ImagePreview");
+        public static string CopyInputContent => Get("CopyInputContent");
+        public static string InputContentCopied => Get("InputContentCopied");
+        public static string CopyFailed => Get("CopyFailed");
+        public static string PleaseEnterContent => Get("PleaseEnterContent");
+        public static string JSONCompress => Get("JSONCompress");
+        public static string JSONCompressed => Get("JSONCompressed");
+        public static string DragToSort => Get("DragToSort");
+        public static string ProcessJSONError => Get("ProcessJSONError");
+        public static string CompressJSONError => Get("CompressJSONError");
+        public static string Processing => Get("Processing");
         public static string SaveImage => Get("SaveImage");
         public static string Close => Get("Close");
         public static string ImageSaved => Get("ImageSaved");
