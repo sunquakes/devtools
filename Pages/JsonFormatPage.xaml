@@ -27,7 +27,7 @@
             <Button Click="Format_Click" Width="80" Height="32" ToolTip="{x:Static resources:Strings.Format}">
                 <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf121;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
             </Button>
-            <Button Click="Compress_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="JSON 压缩">
+            <Button Click="Compress_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="{x:Static resources:Strings.JSONCompress}">
                 <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf066;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
             </Button>
             <Button Click="ExpandAll_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="{x:Static resources:Strings.ExpandAll}">
@@ -36,8 +36,17 @@
             <Button Click="CollapseAll_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="{x:Static resources:Strings.CollapseAll}">
                 <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf077;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
             </Button>
+            <Button Click="CopyInput_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="{x:Static resources:Strings.CopyInputContent}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf062;" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,2,0"/>
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
             <Button Click="CopyFormatted_Click" Margin="8,0,0,0" Width="120" Height="32" ToolTip="{x:Static resources:Strings.CopyFormatted}">
-                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,2,0"/>
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf063;" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                </StackPanel>
             </Button>
         </StackPanel>
 
@@ -49,7 +58,7 @@
                 </ScrollViewer>
                 <Border x:Name="LoadingOverlay" Background="#80000000" Visibility="Collapsed">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="处理中..." FontSize="16" Foreground="White" HorizontalAlignment="Center" />
+                        <TextBlock Text="{x:Static resources:Strings.Processing}" FontSize="16" Foreground="White" HorizontalAlignment="Center" />
                     </StackPanel>
                 </Border>
             </Grid>

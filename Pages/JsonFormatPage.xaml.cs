@@ -173,7 +173,7 @@ namespace DevTools.Pages
             catch (Exception ex)
             {
                 LoadingOverlay.Visibility = Visibility.Collapsed;
-                MessageBox.Show($"处理JSON时出错: {ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{Strings.ProcessJSONError}: {ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -569,7 +569,7 @@ namespace DevTools.Pages
                 // 清空输出面板
                 JsonOutputPanel.Children.Clear();
 
-                MessageBox.Show("JSON 压缩成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Strings.JSONCompressed, Strings.Success, MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (JsonException ex)
             {
@@ -577,7 +577,27 @@ namespace DevTools.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"压缩 JSON 时出错：{ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{Strings.CompressJSONError}: {ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void CopyInput_Click(object sender, RoutedEventArgs e)
+        {
+            var inputText = InputText.Text ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                MessageBox.Show(Strings.PleaseEnterContent, Strings.Info, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                System.Windows.Clipboard.SetText(inputText);
+                MessageBox.Show(Strings.InputContentCopied, Strings.Success, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{Strings.CopyFailed}: {ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

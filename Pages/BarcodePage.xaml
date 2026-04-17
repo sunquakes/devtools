@@ -57,7 +57,7 @@
                                     
                                     <Border Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0" 
                                             Width="32" Height="32" Background="#404040" CornerRadius="4"
-                                            Cursor="SizeAll" ToolTip="拖动排序"
+                                            Cursor="SizeAll" ToolTip="{x:Static resources:Strings.DragToSort}"
                                             PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown"
                                             PreviewMouseMove="DragHandle_PreviewMouseMove"
                                             PreviewMouseLeftButtonUp="DragHandle_PreviewMouseLeftButtonUp"
