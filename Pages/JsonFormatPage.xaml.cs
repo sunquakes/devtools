@@ -538,5 +538,47 @@ namespace DevTools.Pages
         {
             ClipboardHelper.CopyWithFeedback(_lastFormattedJson, (Button)sender);
         }
+
+        private void Compress_Click(object sender, RoutedEventArgs e)
+        {
+            var json = InputText.Text ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                MessageBox.Show(Strings.EnterJSON, Strings.Info, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                // 解析 JSON
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                // 压缩 JSON（移除所有空白）
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = false,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                var compressed = JsonSerializer.Serialize(root, options);
+
+                // 更新输入框为压缩后的 JSON
+                InputText.Text = compressed;
+                _lastFormattedJson = compressed;
+
+                // 清空输出面板
+                JsonOutputPanel.Children.Clear();
+
+                MessageBox.Show("JSON 压缩成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (JsonException ex)
+            {
+                MessageBox.Show($"{Strings.JSONFormatFailed}: {ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"压缩 JSON 时出错：{ex.Message}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

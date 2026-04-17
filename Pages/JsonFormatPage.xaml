@@ -27,6 +27,9 @@
             <Button Click="Format_Click" Width="80" Height="32" ToolTip="{x:Static resources:Strings.Format}">
                 <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf121;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
             </Button>
+            <Button Click="Compress_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="JSON 压缩">
+                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf066;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+            </Button>
             <Button Click="ExpandAll_Click" Margin="8,0,0,0" Width="100" Height="32" ToolTip="{x:Static resources:Strings.ExpandAll}">
                 <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf078;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
             </Button>
