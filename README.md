@@ -170,7 +170,13 @@ MIT License
 
 ## Version
 
-**Current Version:** 2.0.0
+**Current Version:** 2.1.0
+
+### What's New in 2.1.0
+- ✨ **JSON Compress** - Compress JSON to compact single-line format
+- 📋 **Enhanced Copy Buttons** - Clear visual distinction with arrow icons
+- 🌐 **Full i18n Support** - Complete internationalization for all UI elements
+- 🎨 **Improved UX** - Better button layout and visual feedback
 
 ---
 

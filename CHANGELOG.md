@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.1.0] - 2026-04-17
+
+### Added
+- **JSON Compress Feature** - Compress JSON to single-line format
+  - Remove all whitespace and line breaks
+  - Preserve JSON structure and data
+  - Success/error message feedback
+  - Integrated with existing JSON formatter page
+- **Copy Input Content Button** - Copy original JSON input
+  - Up arrow + copy icon combination
+  - Copy content from input textbox
+  - Separate from formatted JSON copy button
+- **Enhanced Copy Buttons** - Distinguish copy sources with icons
+  - Copy Input: Up arrow + Copy icon (⬆️📋)
+  - Copy Formatted: Copy icon + Down arrow (📋⬇️)
+  - Clear visual distinction between two copy actions
+- **Full Internationalization (i18n)** - Complete i18n support for all user-facing text
+  - All MessageBox prompts now use resource strings
+  - All button tooltips internationalized
+  - All loading indicators internationalized
+  - Support for Chinese (zh-CN) and English (en-US)
+  - New resource strings: JSONCompress, JSONCompressed, DragToSort, ProcessJSONError, CompressJSONError, Processing, CopyInputContent, InputContentCopied, CopyFailed, PleaseEnterContent
+
+### Changed
+- **Button Layout** - Reorganized JSON formatter toolbar
+  - Moved copy buttons together for better UX
+  - Button order: Format | Compress | ExpandAll | CollapseAll | CopyInput | CopyFormatted
+  - More intuitive button grouping
+- **Icon Design** - Enhanced copy button icons
+  - Copy Input: Up arrow indicates source is above
+  - Copy Formatted: Down arrow indicates source is below
+  - Visual cues match button functionality
+
+### Technical Details
+- All hardcoded Chinese strings replaced with resource references
+- Complete i18n coverage for all user interface elements
+- Resource files updated: Strings.zh-CN.resx, Strings.en-US.resx, Strings.cs
+
+---
+
 ## [2.0.0] - 2026-04-12
 
 ### Added
