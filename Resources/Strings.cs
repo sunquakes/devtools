@@ -105,6 +105,7 @@ namespace DevTools.Resources
         public static string JSONCompress => Get("JSONCompress");
         public static string JSONCompressed => Get("JSONCompressed");
         public static string DragToSort => Get("DragToSort");
+        public static string DoubleClickToEditRemark => Get("DoubleClickToEditRemark");
         public static string ProcessJSONError => Get("ProcessJSONError");
         public static string CompressJSONError => Get("CompressJSONError");
         public static string Processing => Get("Processing");

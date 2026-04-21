@@ -289,6 +289,9 @@
   <data name="DragToSort" xml:space="preserve">
     <value>Drag to sort</value>
   </data>
+  <data name="DoubleClickToEditRemark" xml:space="preserve">
+    <value>Double-click to edit remark</value>
+  </data>
   <data name="ProcessJSONError" xml:space="preserve">
     <value>Error processing JSON</value>
   </data>

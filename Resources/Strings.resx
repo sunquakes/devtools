@@ -331,4 +331,7 @@
   <data name="AppPathEmptyOrNotFound" xml:space="preserve">
     <value>应用程序路径配置为空或文件不存在</value>
   </data>
+  <data name="DoubleClickToEditRemark" xml:space="preserve">
+    <value>双击修改备注</value>
+  </data>
 </root>

@@ -25,6 +25,7 @@ using Color = System.Windows.Media.Color;
 using Path = System.IO.Path;
 using Mouse = System.Windows.Input.Mouse;
 using Brushes = System.Windows.Media.Brushes;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace DevTools.Pages
 {
@@ -71,7 +72,8 @@ namespace DevTools.Pages
                         { "Text", entry.Text ?? string.Empty },
                         { "Timestamp", entry.Timestamp.ToString("O") },
                         { "ImageBase64", base64 },
-                        { "IsImageVisible", entry.IsImageVisible.ToString() }
+                        { "IsImageVisible", entry.IsImageVisible.ToString() },
+                        { "Remark", entry.Remark ?? "双击修改备注" }
                     });
                 }
             }
@@ -118,7 +120,8 @@ namespace DevTools.Pages
                                         Image = imageSource,
                                         Text = text,
                                         Timestamp = timestamp,
-                                        IsImageVisible = bool.Parse(isVisibleStr)
+                                        IsImageVisible = bool.Parse(isVisibleStr),
+                                        Remark = logData.GetValueOrDefault("Remark", "双击修改备注")
                                     };
                                     entry.TimestampString = entry.Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
                                     _logs.Add(entry);
@@ -395,6 +398,88 @@ namespace DevTools.Pages
             _draggedIndex = -1;
         }
 
+        private DateTime _lastRemarkClickTime = DateTime.MinValue;
+        private object? _lastRemarkClickSender;
+
+        private void RemarkBorder_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != System.Windows.Input.MouseButton.Left)
+                return;
+
+            if (sender is Border border && border.DataContext is BarcodeLogEntry entry)
+            {
+                var now = DateTime.Now;
+                var timeSinceLastClick = (now - _lastRemarkClickTime).TotalMilliseconds;
+                
+                if (timeSinceLastClick < 500 && timeSinceLastClick > 50 && _lastRemarkClickSender == sender)
+                {
+                    entry.IsEditingRemark = true;
+                    
+                    var grid = border.Child as Grid;
+                    if (grid != null)
+                    {
+                        foreach (var child in grid.Children)
+                        {
+                            if (child is TextBox textBox)
+                            {
+                                textBox.Focus();
+                                textBox.SelectAll();
+                                break;
+                            }
+                        }
+                    }
+                    
+                    _lastRemarkClickTime = DateTime.MinValue;
+                    _lastRemarkClickSender = null;
+                    e.Handled = true;
+                }
+                else
+                {
+                    _lastRemarkClickTime = now;
+                    _lastRemarkClickSender = sender;
+                }
+            }
+        }
+
+        private void RemarkTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox && textBox.DataContext is BarcodeLogEntry entry)
+            {
+                entry.IsEditingRemark = false;
+                
+                if (string.IsNullOrWhiteSpace(entry.Remark))
+                {
+                    entry.Remark = "双击修改备注";
+                }
+            }
+        }
+
+        private void RemarkTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                if (sender is TextBox textBox && textBox.DataContext is BarcodeLogEntry entry)
+                {
+                    entry.IsEditingRemark = false;
+                    
+                    if (string.IsNullOrWhiteSpace(entry.Remark))
+                    {
+                        entry.Remark = "双击修改备注";
+                    }
+                    
+                    e.Handled = true;
+                }
+            }
+            else if (e.Key == System.Windows.Input.Key.Escape)
+            {
+                if (sender is TextBox textBox && textBox.DataContext is BarcodeLogEntry entry)
+                {
+                    entry.IsEditingRemark = false;
+                    e.Handled = true;
+                }
+            }
+        }
+
         private BarcodeLogEntry? FindItemAtPosition(Point position)
         {
             if (LogsList == null) return null;
@@ -432,6 +517,14 @@ namespace DevTools.Pages
         private DateTime _timestamp;
         private string? _timestampString;
         private bool _isImageVisible;
+        private string? _remark;
+        private bool _isEditingRemark;
+
+        public BarcodeLogEntry()
+        {
+            _remark = "双击修改备注";
+            _isEditingRemark = false;
+        }
 
         public Bitmap? Bitmap { get => _bitmap; set { _bitmap = value; OnPropertyChanged(nameof(Bitmap)); } }
         public BitmapSource? Image { get => _image; set { _image = value; OnPropertyChanged(nameof(Image)); } }
@@ -439,6 +532,8 @@ namespace DevTools.Pages
         public DateTime Timestamp { get => _timestamp; set { _timestamp = value; OnPropertyChanged(nameof(Timestamp)); } }
         public string? TimestampString { get => _timestampString; set { _timestampString = value; OnPropertyChanged(nameof(TimestampString)); } }
         public bool IsImageVisible { get => _isImageVisible; set { _isImageVisible = value; OnPropertyChanged(nameof(IsImageVisible)); } }
+        public string? Remark { get => _remark; set { _remark = value; OnPropertyChanged(nameof(Remark)); } }
+        public bool IsEditingRemark { get => _isEditingRemark; set { _isEditingRemark = value; OnPropertyChanged(nameof(IsEditingRemark)); } }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
