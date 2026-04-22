@@ -406,4 +406,10 @@
   <data name="AppPathEmptyOrNotFound" xml:space="preserve">
     <value>Application path is empty or file not found</value>
   </data>
+  <data name="ConfirmClear" xml:space="preserve">
+    <value>Confirm Clear</value>
+  </data>
+  <data name="ConfirmClearMessage" xml:space="preserve">
+    <value>Are you sure you want to clear all records? This action cannot be undone.</value>
+  </data>
 </root>

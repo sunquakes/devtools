@@ -260,8 +260,12 @@ namespace DevTools.Pages
 
         private void ClearAll_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var l in _logs) { try { l.Bitmap?.Dispose(); } catch { } }
-            _logs.Clear();
+            var result = MessageBox.Show(Strings.ConfirmClearMessage, Strings.ConfirmClear, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                foreach (var l in _logs) { try { l.Bitmap?.Dispose(); } catch { } }
+                _logs.Clear();
+            }
         }
 
         private BitmapSource BitmapToImageSource(Bitmap bitmap)

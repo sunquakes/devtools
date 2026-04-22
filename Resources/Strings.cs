@@ -126,5 +126,7 @@ namespace DevTools.Resources
         public static string InputEmpty => Get("InputEmpty");
         public static string OutputEmpty => Get("OutputEmpty");
         public static string AppPathEmptyOrNotFound => Get("AppPathEmptyOrNotFound");
+        public static string ConfirmClear => Get("ConfirmClear");
+        public static string ConfirmClearMessage => Get("ConfirmClearMessage");
     }
 }

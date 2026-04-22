@@ -310,4 +310,10 @@
   <data name="Processing" xml:space="preserve">
     <value>处理中...</value>
   </data>
+  <data name="ConfirmClear" xml:space="preserve">
+    <value>确认清除</value>
+  </data>
+  <data name="ConfirmClearMessage" xml:space="preserve">
+    <value>确定要清除所有记录吗？此操作不可撤销。</value>
+  </data>
 </root>
