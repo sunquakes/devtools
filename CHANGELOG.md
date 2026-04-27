@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.2.0] - 2026-04-23
+
+### Added
+- **QR/Barcode Decode** - Decode QR codes and barcodes from images
+  - Image upload via file picker
+  - Drag-and-drop image support
+  - Ctrl+V paste from clipboard
+  - Scrollable image preview for large images
+  - Copy decoded content button
+  - Click placeholder to upload images
+- **Random String Generator** - Generate random strings with configurable options
+  - Configurable count (default: 1) and length (default: 8)
+  - Character set options: lowercase, uppercase, numbers, special characters
+  - Secure random number generation using RandomNumberGenerator
+  - Copy and clear result buttons
+- **Home Page Layout** - Updated to 4 cards per row
+
+### Changed
+- **Home Page Icons** - Updated icons for better visual clarity
+  - Random String: List icon (fa-list)
+  - String Escape: Exchange icon (fa-exchange)
+
+---
+
 ## [2.1.0] - 2026-04-17
 
 ### Added

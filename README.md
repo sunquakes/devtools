@@ -23,11 +23,13 @@
 
 - **MD5 Hash Calculator** - Calculate 32-bit and 16-bit MD5 hashes (uppercase/lowercase)
 - **Barcode Generator** - Generate CODE 128 barcodes
-- **QR Code Generator** - Generate QR codes for text/URLs
+- **QR Code Generator** - Generate QR codes for texts/URLs
 - **Base64 ↔ Image** - Convert between Base64 strings and images
 - **JSON Formatter** - Format, expand, and collapse JSON data
 - **URL Encode/Decode** - Encode and decode URL strings
 - **String Escape/Unescape** - Escape and unescape special characters
+- **QR/Barcode Decode** - Decode QR codes and barcodes from images
+- **Random String Generator** - Generate random strings with configurable options
 - **Handwritten Signature** - Draw signatures and convert to Base64 or save as images
 - **RESTful API** - All tools accessible via HTTP API for AI agent integration
 
@@ -170,13 +172,13 @@ MIT License
 
 ## Version
 
-**Current Version:** 2.1.0
+**Current Version:** 2.2.0
 
-### What's New in 2.1.0
-- ✨ **JSON Compress** - Compress JSON to compact single-line format
-- 📋 **Enhanced Copy Buttons** - Clear visual distinction with arrow icons
-- 🌐 **Full i18n Support** - Complete internationalization for all UI elements
-- 🎨 **Improved UX** - Better button layout and visual feedback
+### What's New in 2.2.0
+- 🔍 **QR/Barcode Decode** - Decode QR codes and barcodes from images with drag-and-drop and paste support
+- 🎲 **Random String Generator** - Generate random strings with configurable character sets
+- 📐 **Home Page Layout** - Updated to 4 cards per row for better screen utilization
+- 🎨 **Improved Icons** - Updated icons for better visual clarity
 
 ---
 
