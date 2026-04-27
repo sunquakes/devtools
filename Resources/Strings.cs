@@ -126,5 +126,28 @@ namespace DevTools.Resources
         public static string InputEmpty => Get("InputEmpty");
         public static string OutputEmpty => Get("OutputEmpty");
         public static string AppPathEmptyOrNotFound => Get("AppPathEmptyOrNotFound");
+        public static string ConfirmClear => Get("ConfirmClear");
+        public static string ConfirmClearMessage => Get("ConfirmClearMessage");
+        public static string PageQrBarcodeDecode => Get("PageQrBarcodeDecode");
+        public static string QrBarcodeDecode => Get("QrBarcodeDecode");
+        public static string UploadImage => Get("UploadImage");
+        public static string PasteImage => Get("PasteImage");
+        public static string DecodeResult => Get("DecodeResult");
+        public static string NoResult => Get("NoResult");
+        public static string DecodeSuccess => Get("DecodeSuccess");
+        public static string QrBarcodeDecodeFailed => Get("QrBarcodeDecodeFailed");
+        public static string ImageCopiedFromClipboard => Get("ImageCopiedFromClipboard");
+        public static string NoImageInClipboard => Get("NoImageInClipboard");
+        public static string DropImageHere => Get("DropImageHere");
+        public static string ClickOrDropImage => Get("ClickOrDropImage");
+        public static string PageRandomString => Get("PageRandomString");
+        public static string RandomString => Get("RandomString");
+        public static string Count => Get("Count");
+        public static string Length => Get("Length");
+        public static string LowercaseLetters => Get("LowercaseLetters");
+        public static string UppercaseLetters => Get("UppercaseLetters");
+        public static string Numbers => Get("Numbers");
+        public static string SpecialCharacters => Get("SpecialCharacters");
+        public static string SelectAtLeastOneOption => Get("SelectAtLeastOneOption");
     }
 }

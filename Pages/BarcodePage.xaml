@@ -16,23 +16,31 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left">
-            <Button Click="Back_Click" HorizontalAlignment="Left" Width="40" Height="40" Margin="0,0,0,8" ToolTip="{x:Static resources:Strings.Back}">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="#4A4A4A" CornerRadius="20" Width="40" Height="40" SnapsToDevicePixels="True">
-                            <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf060;" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFFFF" />
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,8">
+                <Button Click="Back_Click" HorizontalAlignment="Left" Width="40" Height="40" Margin="0,0,8,0" ToolTip="{x:Static resources:Strings.Back}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="#4A4A4A" CornerRadius="20" Width="40" Height="40" SnapsToDevicePixels="True">
+                                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf060;" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Click="ClearAll_Click" Width="40" Height="40" ToolTip="{x:Static resources:Strings.ClearAll}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="#4A4A4A" CornerRadius="20" Width="40" Height="40" SnapsToDevicePixels="True">
+                                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf2ed;" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
                 <TextBlock Text="{x:Static resources:Strings.PageBarcode}" FontSize="18" Margin="10,0" VerticalAlignment="Center" />
                 <TextBox x:Name="InputText" Height="30" Width="300" Margin="10,0" VerticalAlignment="Center" VerticalContentAlignment="Center" />
                 <Button Click="Generate_Click" Width="100" Height="32" Margin="8,0" VerticalAlignment="Center" ToolTip="{x:Static resources:Strings.Generate}">
                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf02a;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
-                </Button>
-                <Button Click="ClearAll_Click" Width="100" Height="32" Margin="8,0" VerticalAlignment="Center" ToolTip="{x:Static resources:Strings.ClearAll}">
-                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf2ed;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
                 </Button>
             </StackPanel>
         </StackPanel>
