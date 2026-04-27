@@ -55,6 +55,16 @@ namespace DevTools.Pages
             NavigationService?.Navigate(new EscapePage());
         }
 
+        private void BtnQrBarcodeDecode_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new QrBarcodeDecodePage());
+        }
+
+        private void BtnRandomString_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new RandomStringPage());
+        }
+
         private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
             NavigationService?.Navigate(new SettingsPage());

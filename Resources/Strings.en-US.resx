@@ -412,4 +412,67 @@
   <data name="ConfirmClearMessage" xml:space="preserve">
     <value>Are you sure you want to clear all records? This action cannot be undone.</value>
   </data>
+  <data name="PageQrBarcodeDecode" xml:space="preserve">
+    <value>QR/Barcode Decoder</value>
+  </data>
+  <data name="QrBarcodeDecode" xml:space="preserve">
+    <value>QR/Barcode Decoder</value>
+  </data>
+  <data name="UploadImage" xml:space="preserve">
+    <value>Upload Image</value>
+  </data>
+  <data name="PasteImage" xml:space="preserve">
+    <value>Paste Image</value>
+  </data>
+  <data name="DecodeResult" xml:space="preserve">
+    <value>Decode Result</value>
+  </data>
+  <data name="NoResult" xml:space="preserve">
+    <value>No QR code or barcode detected</value>
+  </data>
+  <data name="DecodeSuccess" xml:space="preserve">
+    <value>Decode Successful</value>
+  </data>
+  <data name="QrBarcodeDecodeFailed" xml:space="preserve">
+    <value>Decode Failed</value>
+  </data>
+  <data name="ImageCopiedFromClipboard" xml:space="preserve">
+    <value>Image pasted from clipboard</value>
+  </data>
+  <data name="NoImageInClipboard" xml:space="preserve">
+    <value>No image in clipboard</value>
+  </data>
+  <data name="DropImageHere" xml:space="preserve">
+    <value>Drop image here</value>
+  </data>
+  <data name="ClickOrDropImage" xml:space="preserve">
+    <value>Click or drop image here</value>
+  </data>
+  <data name="PageRandomString" xml:space="preserve">
+    <value>Random String Generator</value>
+  </data>
+  <data name="RandomString" xml:space="preserve">
+    <value>Random String</value>
+  </data>
+  <data name="Count" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="Length" xml:space="preserve">
+    <value>Length</value>
+  </data>
+  <data name="LowercaseLetters" xml:space="preserve">
+    <value>Lowercase letters (a..z)</value>
+  </data>
+  <data name="UppercaseLetters" xml:space="preserve">
+    <value>Uppercase letters (A..Z)</value>
+  </data>
+  <data name="Numbers" xml:space="preserve">
+    <value>Numbers (0..9)</value>
+  </data>
+  <data name="SpecialCharacters" xml:space="preserve">
+    <value>Special characters (!@#$%^&amp;*...)</value>
+  </data>
+  <data name="SelectAtLeastOneOption" xml:space="preserve">
+    <value>Please select at least one character set option</value>
+  </data>
 </root>
