@@ -202,10 +202,15 @@ namespace DevTools.Pages
                 return;
             }
 
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var safeText = new string(entry.Text.Where(c => !invalidChars.Contains(c)).ToArray()).Trim();
+            if (safeText.Length > 50) safeText = safeText.Substring(0, 50);
+            if (string.IsNullOrWhiteSpace(safeText)) safeText = "qrcode";
+
             var dlg = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "PNG files (*.png)|*.png|JPEG files (*.jpg;*.jpeg)|*.jpg;*.jpeg|Bitmap (*.bmp)|*.bmp",
-                FileName = "qrcode.png"
+                FileName = $"{safeText}_{DateTime.Now:yyyyMMddHHmmssSSS}.png"
             };
 
             if (dlg.ShowDialog() == true)

@@ -209,7 +209,7 @@ namespace DevTools.Pages
             {
                 Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp|GIF Image|*.gif|All Files|*.*",
                 DefaultExt = ".png",
-                FileName = $"image_{DateTime.Now:yyyyMMdd_HHmmss}.png"
+                FileName = $"image_{DateTime.Now:yyyyMMddHHmmssSSS}.png"
             };
 
             if (dialog.ShowDialog() == true)

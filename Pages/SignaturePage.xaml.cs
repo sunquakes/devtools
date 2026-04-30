@@ -111,7 +111,7 @@ namespace DevTools.Pages
             {
                 Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp|GIF Image|*.gif|All Files|*.*",
                 DefaultExt = ".png",
-                FileName = $"signature_{DateTime.Now:yyyyMMdd_HHmmss}.png"
+                FileName = $"signature_{DateTime.Now:yyyyMMddHHmmssSSS}.png"
             };
 
             if (dialog.ShowDialog() == true)
