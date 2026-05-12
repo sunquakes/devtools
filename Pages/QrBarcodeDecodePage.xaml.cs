@@ -153,7 +153,6 @@ namespace DevTools.Pages
             if (source == null) return null;
 
             var format = source.Format;
-            if (format == null) return null;
 
             var width = source.PixelWidth;
             var height = source.PixelHeight;

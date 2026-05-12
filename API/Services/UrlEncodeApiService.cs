@@ -17,7 +17,7 @@ namespace DevTools.API.Services
                     Operation = "encode"
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new UrlEncodeResult
                 {
@@ -40,7 +40,7 @@ namespace DevTools.API.Services
                     Operation = "decode"
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new UrlEncodeResult
                 {

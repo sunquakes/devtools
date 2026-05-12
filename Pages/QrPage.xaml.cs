@@ -203,7 +203,8 @@ namespace DevTools.Pages
             }
 
             var invalidChars = Path.GetInvalidFileNameChars();
-            var safeText = new string(entry.Text.Where(c => !invalidChars.Contains(c)).ToArray()).Trim();
+            var text = entry.Text ?? string.Empty;
+            var safeText = new string(text.Where(c => !invalidChars.Contains(c)).ToArray()).Trim();
             if (safeText.Length > 50) safeText = safeText.Substring(0, 50);
             if (string.IsNullOrWhiteSpace(safeText)) safeText = "qrcode";
 

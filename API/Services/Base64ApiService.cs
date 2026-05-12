@@ -30,7 +30,7 @@ namespace DevTools.API.Services
                     MimeType = mimeType
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new Base64EncodeResult
                 {
@@ -91,7 +91,7 @@ namespace DevTools.API.Services
                     ImageHeight = height
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new Base64DecodeResult
                 {

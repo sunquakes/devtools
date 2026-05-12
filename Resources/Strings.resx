@@ -334,4 +334,49 @@
   <data name="DoubleClickToEditRemark" xml:space="preserve">
     <value>双击修改备注</value>
   </data>
+  <data name="PageDistrictCode" xml:space="preserve">
+    <value>行政编码查询</value>
+  </data>
+  <data name="QueryByCode" xml:space="preserve">
+    <value>根据行政编码查询省市区</value>
+  </data>
+  <data name="SelectAddressGetCode" xml:space="preserve">
+    <value>选择省市区获取行政编码</value>
+  </data>
+  <data name="DistrictCode" xml:space="preserve">
+    <value>行政编码</value>
+  </data>
+  <data name="ProvinceName" xml:space="preserve">
+    <value>省份名称</value>
+  </data>
+  <data name="CityName" xml:space="preserve">
+    <value>城市名称</value>
+  </data>
+  <data name="DistrictName" xml:space="preserve">
+    <value>区县名称</value>
+  </data>
+  <data name="FullAddress" xml:space="preserve">
+    <value>完整地址</value>
+  </data>
+  <data name="Province" xml:space="preserve">
+    <value>省份</value>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value>城市</value>
+  </data>
+  <data name="District" xml:space="preserve">
+    <value>区县</value>
+  </data>
+  <data name="Query" xml:space="preserve">
+    <value>查询</value>
+  </data>
+  <data name="EnterDistrictCode" xml:space="preserve">
+    <value>请输入行政编码</value>
+  </data>
+  <data name="DistrictCodeNotFound" xml:space="preserve">
+    <value>未找到该行政编码对应的地址信息</value>
+  </data>
+  <data name="NoDataToCopy" xml:space="preserve">
+    <value>没有可复制的数据</value>
+  </data>
 </root>

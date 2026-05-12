@@ -30,11 +30,11 @@ namespace DevTools.API.Server
         public bool IsRunning => _isRunning;
         public int Port => _settings.Port;
 
-        public async Task<bool> StartAsync()
+        public Task<bool> StartAsync()
         {
             if (_isRunning)
             {
-                return true;
+                return Task.FromResult(true);
             }
 
             try
@@ -47,13 +47,13 @@ namespace DevTools.API.Server
                 _cts = new CancellationTokenSource();
                 _isRunning = true;
 
-                Task.Run(() => RunListener(_cts.Token));
+                _ = RunListener(_cts.Token);
 
-                return true;
+                return Task.FromResult(true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return false;
+                return Task.FromResult(false);
             }
         }
 

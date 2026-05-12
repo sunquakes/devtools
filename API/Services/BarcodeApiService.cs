@@ -53,7 +53,7 @@ namespace DevTools.API.Services
                     Height = height
                 };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new BarcodeResult
                 {

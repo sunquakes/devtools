@@ -100,7 +100,7 @@ namespace DevTools
             }
         }
 
-        private async void InitializeNotifyIcon()
+        private void InitializeNotifyIcon()
         {
             Icon? icon = LoadIcon();
 

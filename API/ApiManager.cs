@@ -61,7 +61,7 @@ namespace DevTools.API
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

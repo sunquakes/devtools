@@ -65,6 +65,11 @@ namespace DevTools.Pages
             NavigationService?.Navigate(new RandomStringPage());
         }
 
+        private void BtnDistrictCode_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new DistrictCodePage());
+        }
+
         private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
             NavigationService?.Navigate(new SettingsPage());
