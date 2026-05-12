@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using DevTools.Helpers;
 using DevTools.Services;
 using Button = System.Windows.Controls.Button;
@@ -55,6 +56,14 @@ namespace DevTools.Pages
             if (results.Count == 0)
             {
                 MessageBox.Show("未找到匹配的结果", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is System.Windows.Controls.TextBox textBox)
+            {
+                textBox.SelectAll();
             }
         }
     }

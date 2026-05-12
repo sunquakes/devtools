@@ -28,25 +28,45 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="SearchInput" Grid.Column="0" Height="32" FontSize="14" />
-                <Button Click="Search_Click" Grid.Column="1" Margin="8,0,0,0" Width="80" Height="32" Content="搜索" />
+                <Button Click="Search_Click" Grid.Column="1" Margin="8,0,0,0" Width="80" Height="32" ToolTip="搜索">
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf002;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                </Button>
             </Grid>
         </GroupBox>
 
         <GroupBox Grid.Row="2" Header="搜索结果" Margin="0,10,0,0" Padding="15">
             <ListView x:Name="ResultListView">
+                <ListView.Resources>
+                    <Style TargetType="TextBox" x:Key="NoBorderTextBoxStyle">
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Padding" Value="4,2" />
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.Resources>
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="地址名称" Width="450">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding DisplayName, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="4,2" FontSize="13" />
+                                    <TextBox Text="{Binding DisplayName, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource NoBorderTextBoxStyle}" MouseDoubleClick="TextBox_MouseDoubleClick" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="行政编码" Width="200">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding Code, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="4,2" FontSize="13" />
+                                    <TextBox Text="{Binding Code, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource NoBorderTextBoxStyle}" MouseDoubleClick="TextBox_MouseDoubleClick" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
