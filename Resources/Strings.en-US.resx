@@ -475,4 +475,16 @@
   <data name="SelectAtLeastOneOption" xml:space="preserve">
     <value>Please select at least one character set option</value>
   </data>
+  <data name="CategoryEncoding" xml:space="preserve">
+    <value>Encoding Tools</value>
+  </data>
+  <data name="CategoryImage" xml:space="preserve">
+    <value>Image Tools</value>
+  </data>
+  <data name="CategoryData" xml:space="preserve">
+    <value>Data Processing</value>
+  </data>
+  <data name="CategoryQuery" xml:space="preserve">
+    <value>Query Tools</value>
+  </data>
 </root>

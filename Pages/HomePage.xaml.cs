@@ -95,7 +95,6 @@ namespace DevTools.Pages
         {
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                // Show all buttons and tabs
                 SetAllButtonsVisibility(Visibility.Visible);
                 SetAllTabsVisibility(Visibility.Visible);
                 return;
@@ -107,7 +106,6 @@ namespace DevTools.Pages
             var allTabs = FindVisualChildren<TabItem>(this);
             foreach (var tab in allTabs)
             {
-                // Get tab header text - handle both string and resource binding
                 string tabHeader = "";
                 if (tab.Header is string headerString)
                 {
@@ -115,7 +113,6 @@ namespace DevTools.Pages
                 }
                 else
                 {
-                    // Try to get text from TextBlock if header is a visual element
                     var textBlock = FindVisualChildren<TextBlock>(tab).FirstOrDefault();
                     if (textBlock != null)
                     {
@@ -123,7 +120,9 @@ namespace DevTools.Pages
                     }
                 }
                 
-                var tabVisible = tabHeader.Contains(searchLower);
+                // Check both header text and Tag (which may contain English name)
+                var tabTag = tab.Tag?.ToString()?.ToLower() ?? "";
+                var tabVisible = tabHeader.Contains(searchLower) || tabTag.Contains(searchLower);
                 tab.Visibility = tabVisible ? Visibility.Visible : Visibility.Collapsed;
             }
             
@@ -133,15 +132,16 @@ namespace DevTools.Pages
             
             foreach (var button in allButtons)
             {
-                if (button.Name == "BtnSettings") continue; // Skip settings button
+                if (button.Name == "BtnSettings") continue;
                 
                 var buttonName = button.Name?.ToLower() ?? "";
                 var buttonTag = button.Tag?.ToString()?.ToLower() ?? "";
-                
-                // Get button text content (supports both Chinese and English)
                 var buttonText = GetButtonText(button)?.ToLower() ?? "";
                 
                 // Check if button name, tag, or text contains search text
+                // buttonName: e.g., "BtnMd5", "BtnUrlEncode" (English identifier)
+                // buttonTag: may contain additional keywords
+                // buttonText: displayed text (Chinese or English based on language)
                 var isVisible = buttonName.Contains(searchLower) || 
                                buttonTag.Contains(searchLower) ||
                                buttonText.Contains(searchLower);
@@ -151,8 +151,6 @@ namespace DevTools.Pages
                 if (isVisible) visibleButtonCount++;
             }
             
-            // Adjust alignment based on visible button count
-            // If only one button is visible, align center; otherwise left
             var allWrapPanels = FindVisualChildren<WrapPanel>(this);
             foreach (var wrapPanel in allWrapPanels)
             {

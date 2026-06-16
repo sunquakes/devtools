@@ -154,29 +154,29 @@
                     Margin="20,60,20,20">
             
             <!-- 编码工具 -->
-            <TabItem Header="编码工具" Tag="&#xf121;" Style="{StaticResource ModernTabItem}">
+            <TabItem Header="{x:Static resources:Strings.CategoryEncoding}" Tag="&#xf121;" Style="{StaticResource ModernTabItem}">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Grid Width="Auto">
                         <WrapPanel HorizontalAlignment="Left" Margin="10" Orientation="Horizontal">
-                            <Button x:Name="BtnMd5" Click="BtnMd5_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnMd5" Click="BtnMd5_Click" Style="{StaticResource ToolButtonStyle}" Tag="MD5">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf023;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.MD5}" FontSize="15" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnUrlEncode" Click="BtnUrlEncode_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnUrlEncode" Click="BtnUrlEncode_Click" Style="{StaticResource ToolButtonStyle}" Tag="URL Encode Decode 编码 解码">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c1;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.PageUrlEncode}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnEscape" Click="BtnEscape_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnEscape" Click="BtnEscape_Click" Style="{StaticResource ToolButtonStyle}" Tag="Escape String Escape 转义">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf121;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.PageEscape}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnRandomString" Click="BtnRandomString_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnRandomString" Click="BtnRandomString_Click" Style="{StaticResource ToolButtonStyle}" Tag="Random String Generator 随机字符串">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf074;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.PageRandomString}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
@@ -188,41 +188,41 @@
             </TabItem>
 
             <!-- 图片工具 -->
-            <TabItem Header="图片工具" Tag="&#xf03e;" Style="{StaticResource ModernTabItem}">
+            <TabItem Header="{x:Static resources:Strings.CategoryImage}" Tag="&#xf03e;" Style="{StaticResource ModernTabItem}">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Grid Width="Auto">
                         <WrapPanel HorizontalAlignment="Left" Margin="10" Orientation="Horizontal">
-                            <Button x:Name="BtnQr" Click="BtnQr_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnQr" Click="BtnQr_Click" Style="{StaticResource ToolButtonStyle}" Tag="QR Code 二维码">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf029;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.QRCode}" FontSize="15" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnBarcode" Click="BtnBarcode_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnBarcode" Click="BtnBarcode_Click" Style="{StaticResource ToolButtonStyle}" Tag="Barcode 条形码">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf02a;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.Barcode}" FontSize="15" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnBase64ToImage" Click="BtnBase64ToImage_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnBase64ToImage" Click="BtnBase64ToImage_Click" Style="{StaticResource ToolButtonStyle}" Tag="Base64 to Image Base64转图片">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf03e;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.Base64ToImage}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnImageToBase64" Click="BtnImageToBase64_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnImageToBase64" Click="BtnImageToBase64_Click" Style="{StaticResource ToolButtonStyle}" Tag="Image to Base64 图片转Base64">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf093;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.ImageToBase64}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnSignature" Click="BtnSignature_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnSignature" Click="BtnSignature_Click" Style="{StaticResource ToolButtonStyle}" Tag="Handwritten Signature 手写签名">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf5b7;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.PageSignature}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="BtnQrBarcodeDecode" Click="BtnQrBarcodeDecode_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnQrBarcodeDecode" Click="BtnQrBarcodeDecode_Click" Style="{StaticResource ToolButtonStyle}" Tag="QR Barcode Decoder 二维码识别 条形码识别">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf083;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.PageQrBarcodeDecode}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
@@ -234,11 +234,11 @@
             </TabItem>
 
             <!-- 数据处理 -->
-            <TabItem Header="数据处理" Tag="&#xf1c0;" Style="{StaticResource ModernTabItem}">
+            <TabItem Header="{x:Static resources:Strings.CategoryData}" Tag="&#xf1c0;" Style="{StaticResource ModernTabItem}">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Grid Width="Auto">
                         <WrapPanel HorizontalAlignment="Left" Margin="10" Orientation="Horizontal">
-                            <Button x:Name="BtnJsonFormat" Click="BtnJsonFormat_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnJsonFormat" Click="BtnJsonFormat_Click" Style="{StaticResource ToolButtonStyle}" Tag="JSON Format 格式化">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf1c9;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
                                     <TextBlock Text="{x:Static resources:Strings.JSONFormat}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
@@ -250,14 +250,14 @@
             </TabItem>
 
             <!-- 查询工具 -->
-            <TabItem Header="查询工具" Tag="&#xf002;" Style="{StaticResource ModernTabItem}">
+            <TabItem Header="{x:Static resources:Strings.CategoryQuery}" Tag="&#xf002;" Style="{StaticResource ModernTabItem}">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Grid Width="Auto">
                         <WrapPanel HorizontalAlignment="Left" Margin="10" Orientation="Horizontal">
-                            <Button x:Name="BtnDistrictCode" Click="BtnDistrictCode_Click" Style="{StaticResource ToolButtonStyle}">
+                            <Button x:Name="BtnDistrictCode" Click="BtnDistrictCode_Click" Style="{StaticResource ToolButtonStyle}" Tag="District Code Query 行政编码查询">
                                 <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf3c5;" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#FFFFFF" />
-                                    <TextBlock Text="行政编码查询" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
+                                    <TextBlock Text="{x:Static resources:Strings.PageDistrictCode}" FontSize="14" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="#FFFFFF" />
                                 </StackPanel>
                             </Button>
                         </WrapPanel>
