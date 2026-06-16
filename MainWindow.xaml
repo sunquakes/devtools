@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:DevTools"
         mc:Ignorable="d"
         Title="DevTools"
-        Width="1000" Height="700"
-        MinWidth="1000" MinHeight="700"
+        Width="1010" Height="700"
+        MinWidth="1010" MinHeight="700"
         Icon="pack://application:,,,/Resources/Images/logo.png"
         Closing="Window_Closing">
     <Grid>
