@@ -76,7 +76,6 @@ build/*
 # ----- Added for Visual Studio / .NET projects -----
 # Visual Studio cache and settings
 .vs/
-.vscode/
 *.user
 *.userosscache
 *.sln.docstates
