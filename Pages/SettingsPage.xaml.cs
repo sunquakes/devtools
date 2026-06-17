@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -51,6 +52,46 @@ namespace DevTools.Pages
             if (!string.IsNullOrWhiteSpace(hotkey))
             {
                 HotkeyText = hotkey;
+            }
+            
+            // Load language settings
+            LoadLanguageSettings();
+        }
+
+        private void LoadLanguageSettings()
+        {
+            // Add language options
+            LanguageComboBox.Items.Add(new ComboBoxItem { Content = "中文", Tag = "zh-CN" });
+            LanguageComboBox.Items.Add(new ComboBoxItem { Content = "English", Tag = "en-US" });
+            
+            // Set current language
+            var currentLang = Properties.Settings.Default.Language;
+            foreach (ComboBoxItem item in LanguageComboBox.Items)
+            {
+                if (item.Tag.ToString() == currentLang)
+                {
+                    LanguageComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LanguageComboBox.SelectedItem is ComboBoxItem selectedItem)
+            {
+                var lang = selectedItem.Tag.ToString();
+                Properties.Settings.Default.Language = lang;
+                Properties.Settings.Default.Save();
+                
+                // Set the UI culture
+                CultureInfo.CurrentUICulture = new CultureInfo(lang);
+                
+                // Restart the application to apply changes
+                MessageBox.Show(Strings.LanguageChangedRestart, Strings.Info, MessageBoxButton.OK, MessageBoxImage.Information);
+                
+                // Restart the application
+                System.Windows.Forms.Application.Restart();
             }
         }
 

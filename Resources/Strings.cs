@@ -154,5 +154,9 @@ namespace DevTools.Resources
         public static string CategoryImage => Get("CategoryImage");
         public static string CategoryData => Get("CategoryData");
         public static string CategoryQuery => Get("CategoryQuery");
+        public static string Language => Get("Language");
+        public static string Chinese => Get("Chinese");
+        public static string English => Get("English");
+        public static string LanguageChangedRestart => Get("LanguageChangedRestart");
     }
 }

@@ -382,6 +382,18 @@
   <data name="PageAgents" xml:space="preserve">
     <value>AGENTS</value>
   </data>
+  <data name="Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="Chinese" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageChangedRestart" xml:space="preserve">
+    <value>语言已更改，应用程序将重新启动以应用更改。</value>
+  </data>
   <data name="Agents" xml:space="preserve">
     <value>AGENTS</value>
   </data>

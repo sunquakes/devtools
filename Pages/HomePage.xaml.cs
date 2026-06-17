@@ -102,31 +102,7 @@ namespace DevTools.Pages
 
             var searchLower = searchText.ToLower();
             
-            // Filter tabs based on their headers
-            var allTabs = FindVisualChildren<TabItem>(this);
-            foreach (var tab in allTabs)
-            {
-                string tabHeader = "";
-                if (tab.Header is string headerString)
-                {
-                    tabHeader = headerString.ToLower();
-                }
-                else
-                {
-                    var textBlock = FindVisualChildren<TextBlock>(tab).FirstOrDefault();
-                    if (textBlock != null)
-                    {
-                        tabHeader = textBlock.Text?.ToLower() ?? "";
-                    }
-                }
-                
-                // Check both header text and Tag (which may contain English name)
-                var tabTag = tab.Tag?.ToString()?.ToLower() ?? "";
-                var tabVisible = tabHeader.Contains(searchLower) || tabTag.Contains(searchLower);
-                tab.Visibility = tabVisible ? Visibility.Visible : Visibility.Collapsed;
-            }
-            
-            // Filter buttons in all tabs
+            // Filter buttons in all tabs and check if tab has matching buttons
             var allButtons = FindVisualChildren<System.Windows.Controls.Button>(this);
             var visibleButtonCount = 0;
             
@@ -149,6 +125,36 @@ namespace DevTools.Pages
                 button.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
                 
                 if (isVisible) visibleButtonCount++;
+            }
+            
+            // Filter tabs based on whether they have visible buttons
+            var allTabs = FindVisualChildren<TabItem>(this);
+            foreach (var tab in allTabs)
+            {
+                // Check if tab contains any visible buttons
+                var tabButtons = FindVisualChildren<System.Windows.Controls.Button>(tab);
+                var hasVisibleButton = tabButtons.Any(b => b.Visibility == Visibility.Visible && b.Name != "BtnSettings");
+                
+                // Also check tab's own header and tag
+                string tabHeader = "";
+                if (tab.Header is string headerString)
+                {
+                    tabHeader = headerString.ToLower();
+                }
+                else
+                {
+                    var textBlock = FindVisualChildren<System.Windows.Controls.TextBlock>(tab).FirstOrDefault();
+                    if (textBlock != null)
+                    {
+                        tabHeader = textBlock.Text?.ToLower() ?? "";
+                    }
+                }
+                
+                var tabTag = tab.Tag?.ToString()?.ToLower() ?? "";
+                var tabMatchesSearch = tabHeader.Contains(searchLower) || tabTag.Contains(searchLower);
+                
+                // Tab is visible if it has visible buttons OR its own header/tag matches
+                tab.Visibility = (hasVisibleButton || tabMatchesSearch) ? Visibility.Visible : Visibility.Collapsed;
             }
             
             var allWrapPanels = FindVisualChildren<WrapPanel>(this);
