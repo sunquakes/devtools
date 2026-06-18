@@ -3,6 +3,17 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:resources="clr-namespace:DevTools.Resources"
       Title="SettingsPage">
+    <Page.Resources>
+        <Style x:Key="LanguageComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Width" Value="110"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4A90D9"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,4"/>
+        </Style>
+    </Page.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -33,16 +44,17 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" 
-                               Text="{x:Static resources:Strings.Language}" 
-                               FontSize="14"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0ac;" FontSize="16" Foreground="#4A90D9" Margin="0,0,8,0" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="0" 
+                                   Text="{x:Static resources:Strings.Language}" 
+                                   FontSize="14"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
                     <ComboBox x:Name="LanguageComboBox" 
                               Grid.Column="1"
-                              Width="150"
-                              Height="32"
-                              FontSize="14"
+                              Style="{StaticResource LanguageComboBoxStyle}"
+                              HorizontalAlignment="Right"
                               SelectionChanged="LanguageComboBox_SelectionChanged" />
                 </Grid>
                 

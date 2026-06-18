@@ -43,6 +43,8 @@ namespace DevTools.Pages
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private bool _isInitializing = true;
+
         private void LoadSettings()
         {
             AutoStartCheckBox.IsChecked = IsAutoStartEnabled();
@@ -61,37 +63,42 @@ namespace DevTools.Pages
         private void LoadLanguageSettings()
         {
             // Add language options
-            LanguageComboBox.Items.Add(new ComboBoxItem { Content = "中文", Tag = "zh-CN" });
-            LanguageComboBox.Items.Add(new ComboBoxItem { Content = "English", Tag = "en-US" });
+            LanguageComboBox.Items.Add(new ComboBoxItem { Content = Strings.Chinese, Tag = "zh-CN" });
+            LanguageComboBox.Items.Add(new ComboBoxItem { Content = Strings.English, Tag = "en-US" });
             
             // Set current language
             var currentLang = Properties.Settings.Default.Language;
             foreach (ComboBoxItem item in LanguageComboBox.Items)
             {
-                if (item.Tag.ToString() == currentLang)
+                if (item.Tag?.ToString() == currentLang)
                 {
                     LanguageComboBox.SelectedItem = item;
                     break;
                 }
             }
+            
+            _isInitializing = false;
         }
 
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Skip during initialization
+            if (_isInitializing) return;
+            
             if (LanguageComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
-                var lang = selectedItem.Tag.ToString();
-                Properties.Settings.Default.Language = lang;
-                Properties.Settings.Default.Save();
+                var lang = selectedItem.Tag?.ToString() ?? "zh-CN";
+                var oldLang = Properties.Settings.Default.Language;
                 
-                // Set the UI culture
-                CultureInfo.CurrentUICulture = new CultureInfo(lang);
-                
-                // Restart the application to apply changes
-                MessageBox.Show(Strings.LanguageChangedRestart, Strings.Info, MessageBoxButton.OK, MessageBoxImage.Information);
-                
-                // Restart the application
-                System.Windows.Forms.Application.Restart();
+                // Only restart if language actually changed
+                if (lang != oldLang)
+                {
+                    Properties.Settings.Default.Language = lang;
+                    Properties.Settings.Default.Save();
+                    
+                    // Restart to apply changes
+                    System.Windows.Forms.Application.Restart();
+                }
             }
         }
 

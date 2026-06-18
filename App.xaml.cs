@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -43,7 +44,27 @@ namespace DevTools
                 return;
             }
 
+            // Apply saved language setting
+            ApplyLanguageSetting();
+
             base.OnStartup(e);
+        }
+
+        private void ApplyLanguageSetting()
+        {
+            try
+            {
+                var lang = DevTools.Properties.Settings.Default.Language;
+                if (!string.IsNullOrEmpty(lang))
+                {
+                    var culture = new CultureInfo(lang);
+                    System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+                    System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+                    CultureInfo.DefaultThreadCurrentCulture = culture;
+                    CultureInfo.DefaultThreadCurrentUICulture = culture;
+                }
+            }
+            catch { }
         }
 
         private void ActivateExistingInstance()
