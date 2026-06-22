@@ -148,7 +148,9 @@
                  VerticalAlignment="Top" 
                  Margin="20,10,0,0"
                  TextChanged="SearchBox_TextChanged"
-                 KeyDown="SearchBox_KeyDown"/>
+                 KeyDown="SearchBox_KeyDown"
+                 IsUndoEnabled="True"
+                 UndoLimit="20"/>
         
         <TabControl Style="{StaticResource ModernTabControl}" 
                     Margin="20,60,20,20">

@@ -74,6 +74,9 @@ namespace DevTools
 
         protected override void OnExit(ExitEventArgs e)
         {
+            // Shutdown background services
+            DevTools.API.ApiManager.Instance.Shutdown();
+            
             _mutex?.ReleaseMutex();
             _mutex?.Dispose();
             base.OnExit(e);

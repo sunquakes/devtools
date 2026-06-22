@@ -379,6 +379,9 @@
   <data name="SelectAtLeastOneOption" xml:space="preserve">
     <value>请至少选择一个字符集选项</value>
   </data>
+  <data name="Search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
   <data name="PageDistrictCode" xml:space="preserve">
     <value>行政编码查询</value>
   </data>
@@ -424,6 +427,9 @@
   <data name="NoDataToCopy" xml:space="preserve">
     <value>没有可复制的数据</value>
   </data>
+  <data name="CategoryQuery" xml:space="preserve">
+    <value>查询工具</value>
+  </data>
   <data name="Language" xml:space="preserve">
     <value>语言</value>
   </data>
@@ -435,5 +441,14 @@
   </data>
   <data name="LanguageChangedRestart" xml:space="preserve">
     <value>语言已更改，应用程序将重新启动以应用更改。</value>
+  </data>
+  <data name="SearchAddressOrCode" xml:space="preserve">
+    <value>输入地址名称或行政编码进行搜索</value>
+  </data>
+  <data name="SearchResults" xml:space="preserve">
+    <value>搜索结果</value>
+  </data>
+  <data name="AddressName" xml:space="preserve">
+    <value>地址名称</value>
   </data>
 </root>

@@ -149,7 +149,12 @@ namespace DevTools.Resources
         public static string Numbers => Get("Numbers");
         public static string SpecialCharacters => Get("SpecialCharacters");
         public static string SelectAtLeastOneOption => Get("SelectAtLeastOneOption");
+        public static string Search => Get("Search");
         public static string PageDistrictCode => Get("PageDistrictCode");
+        public static string DistrictCode => Get("DistrictCode");
+        public static string SearchAddressOrCode => Get("SearchAddressOrCode");
+        public static string SearchResults => Get("SearchResults");
+        public static string AddressName => Get("AddressName");
         public static string CategoryEncoding => Get("CategoryEncoding");
         public static string CategoryImage => Get("CategoryImage");
         public static string CategoryData => Get("CategoryData");

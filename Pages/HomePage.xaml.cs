@@ -3,14 +3,29 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 
 namespace DevTools.Pages
 {
     public partial class HomePage : Page
     {
+        private System.Windows.Threading.DispatcherTimer _searchTimer;
+        
         public HomePage()
         {
             InitializeComponent();
+            
+            // Initialize search debounce timer
+            _searchTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(300) // 300ms delay
+            };
+            _searchTimer.Tick += (s, e) =>
+            {
+                _searchTimer.Stop();
+                FilterTools(SearchBox.Text);
+            };
         }
 
         private void BtnMd5_Click(object sender, RoutedEventArgs e)
@@ -80,7 +95,9 @@ namespace DevTools.Pages
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            FilterTools(SearchBox.Text);
+            // Debounce: restart timer on each text change
+            _searchTimer.Stop();
+            _searchTimer.Start();
         }
 
         private void SearchBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -116,7 +133,7 @@ namespace DevTools.Pages
                 
                 // Check if button name, tag, or text contains search text
                 // buttonName: e.g., "BtnMd5", "BtnUrlEncode" (English identifier)
-                // buttonTag: may contain additional keywords
+                // buttonTag: contains search keywords (both English and Chinese)
                 // buttonText: displayed text (Chinese or English based on language)
                 var isVisible = buttonName.Contains(searchLower) || 
                                buttonTag.Contains(searchLower) ||
@@ -129,6 +146,8 @@ namespace DevTools.Pages
             
             // Filter tabs based on whether they have visible buttons
             var allTabs = FindVisualChildren<TabItem>(this);
+            TabItem firstVisibleTab = null;
+            
             foreach (var tab in allTabs)
             {
                 // Check if tab contains any visible buttons
@@ -154,7 +173,24 @@ namespace DevTools.Pages
                 var tabMatchesSearch = tabHeader.Contains(searchLower) || tabTag.Contains(searchLower);
                 
                 // Tab is visible if it has visible buttons OR its own header/tag matches
-                tab.Visibility = (hasVisibleButton || tabMatchesSearch) ? Visibility.Visible : Visibility.Collapsed;
+                var isTabVisible = (hasVisibleButton || tabMatchesSearch);
+                tab.Visibility = isTabVisible ? Visibility.Visible : Visibility.Collapsed;
+                
+                // Remember the first visible tab
+                if (isTabVisible && firstVisibleTab == null)
+                {
+                    firstVisibleTab = tab;
+                }
+            }
+            
+            // Automatically select the first visible tab
+            if (firstVisibleTab != null)
+            {
+                var tabControl = FindVisualChildren<System.Windows.Controls.TabControl>(this).FirstOrDefault();
+                if (tabControl != null)
+                {
+                    tabControl.SelectedItem = firstVisibleTab;
+                }
             }
             
             var allWrapPanels = FindVisualChildren<WrapPanel>(this);
@@ -215,19 +251,40 @@ namespace DevTools.Pages
         {
             if (depObj == null) yield break;
 
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            // First check logical tree (works for all tabs, not just selected)
+            foreach (var child in LogicalTreeHelper.GetChildren(depObj))
             {
-                var child = VisualTreeHelper.GetChild(depObj, i);
-                if (child != null && child is T)
+                if (child is T typedChild)
                 {
-                    yield return (T)child;
+                    yield return typedChild;
                 }
 
-                if (child != null)
+                if (child is DependencyObject childDepObj)
                 {
-                    foreach (var childOfChild in FindVisualChildren<T>(child))
+                    foreach (var childOfChild in FindVisualChildren<T>(childDepObj))
                     {
                         yield return childOfChild;
+                    }
+                }
+            }
+
+            // Fallback to visual tree for templates (only if it's a Visual or Visual3D)
+            if (depObj is Visual || depObj is Visual3D)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    var child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    if (child != null)
+                    {
+                        foreach (var childOfChild in FindVisualChildren<T>(child))
+                        {
+                            yield return childOfChild;
+                        }
                     }
                 }
             }
