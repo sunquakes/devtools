@@ -34,7 +34,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#FFFFFF"/>
-                                <Setter TargetName="icon" Property="Foreground" Value="#4A90D9"/>
+                                <Setter TargetName="icon" Property="Foreground" Value="#666666"/>
                                 <Setter TargetName="text" Property="Foreground" Value="#333333"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -77,7 +77,7 @@
             <Setter Property="Width" Value="160"/>
             <Setter Property="Height" Value="130"/>
             <Setter Property="Margin" Value="10"/>
-            <Setter Property="Background" Value="#4A90D9"/>
+            <Setter Property="Background" Value="#6B7280"/>
         </Style>
 
         <!-- Search box style -->
@@ -90,7 +90,7 @@
             <Setter Property="BorderBrush" Value="#E0E0E0"/>
             <Setter Property="Background" Value="#FFFFFF"/>
             <Setter Property="Foreground" Value="#333333"/>
-            <Setter Property="CaretBrush" Value="#4A90D9"/>
+            <Setter Property="CaretBrush" Value="#666666"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
@@ -113,7 +113,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#4A90D9"/>
+                                <Setter Property="BorderBrush" Value="#666666"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
