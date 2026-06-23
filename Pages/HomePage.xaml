@@ -32,16 +32,22 @@
                             </StackPanel>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <!-- Selected state (highest priority) -->
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#FFFFFF"/>
-                                <Setter TargetName="icon" Property="Foreground" Value="#666666"/>
+                                <Setter TargetName="icon" Property="Foreground" Value="#333333"/>
                                 <Setter TargetName="text" Property="Foreground" Value="#333333"/>
                             </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#F0F0F0"/>
-                                <Setter TargetName="icon" Property="Foreground" Value="#666666"/>
+                            <!-- Hover state (only when not selected) -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="False"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="border" Property="Background" Value="#E8E8E8"/>
+                                <Setter TargetName="icon" Property="Foreground" Value="#555555"/>
                                 <Setter TargetName="text" Property="Foreground" Value="#333333"/>
-                            </Trigger>
+                            </MultiTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

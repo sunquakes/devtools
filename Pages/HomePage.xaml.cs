@@ -119,9 +119,12 @@ namespace DevTools.Pages
 
             var searchLower = searchText.ToLower();
             
-            // Filter buttons in all tabs and check if tab has matching buttons
+            // Get TabControl and current selected tab first
+            var tabControl = FindVisualChildren<System.Windows.Controls.TabControl>(this).FirstOrDefault();
+            TabItem currentSelectedTab = tabControl?.SelectedItem as TabItem;
+            
+            // Filter buttons in all tabs
             var allButtons = FindVisualChildren<System.Windows.Controls.Button>(this);
-            var visibleButtonCount = 0;
             
             foreach (var button in allButtons)
             {
@@ -131,20 +134,14 @@ namespace DevTools.Pages
                 var buttonTag = button.Tag?.ToString()?.ToLower() ?? "";
                 var buttonText = GetButtonText(button)?.ToLower() ?? "";
                 
-                // Check if button name, tag, or text contains search text
-                // buttonName: e.g., "BtnMd5", "BtnUrlEncode" (English identifier)
-                // buttonTag: contains search keywords (both English and Chinese)
-                // buttonText: displayed text (Chinese or English based on language)
                 var isVisible = buttonName.Contains(searchLower) || 
                                buttonTag.Contains(searchLower) ||
                                buttonText.Contains(searchLower);
                 
                 button.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
-                
-                if (isVisible) visibleButtonCount++;
             }
             
-            // Filter tabs based on whether they have visible buttons
+            // Filter tabs and find first visible tab
             var allTabs = FindVisualChildren<TabItem>(this);
             TabItem firstVisibleTab = null;
             
@@ -154,49 +151,27 @@ namespace DevTools.Pages
                 var tabButtons = FindVisualChildren<System.Windows.Controls.Button>(tab);
                 var hasVisibleButton = tabButtons.Any(b => b.Visibility == Visibility.Visible && b.Name != "BtnSettings");
                 
-                // Also check tab's own header and tag
-                string tabHeader = "";
-                if (tab.Header is string headerString)
-                {
-                    tabHeader = headerString.ToLower();
-                }
-                else
-                {
-                    var textBlock = FindVisualChildren<System.Windows.Controls.TextBlock>(tab).FirstOrDefault();
-                    if (textBlock != null)
-                    {
-                        tabHeader = textBlock.Text?.ToLower() ?? "";
-                    }
-                }
-                
+                // Check tab's own header and tag
+                var tabHeader = (tab.Header as string)?.ToLower() ?? "";
                 var tabTag = tab.Tag?.ToString()?.ToLower() ?? "";
                 var tabMatchesSearch = tabHeader.Contains(searchLower) || tabTag.Contains(searchLower);
                 
-                // Tab is visible if it has visible buttons OR its own header/tag matches
-                var isTabVisible = (hasVisibleButton || tabMatchesSearch);
+                var isTabVisible = hasVisibleButton || tabMatchesSearch;
                 tab.Visibility = isTabVisible ? Visibility.Visible : Visibility.Collapsed;
                 
-                // Remember the first visible tab
                 if (isTabVisible && firstVisibleTab == null)
                 {
                     firstVisibleTab = tab;
                 }
             }
             
-            // Automatically select the first visible tab
-            if (firstVisibleTab != null)
+            // Only auto-select if current tab is not visible
+            if (tabControl != null && firstVisibleTab != null && currentSelectedTab != null)
             {
-                var tabControl = FindVisualChildren<System.Windows.Controls.TabControl>(this).FirstOrDefault();
-                if (tabControl != null)
+                if (currentSelectedTab.Visibility != Visibility.Visible)
                 {
                     tabControl.SelectedItem = firstVisibleTab;
                 }
-            }
-            
-            var allWrapPanels = FindVisualChildren<WrapPanel>(this);
-            foreach (var wrapPanel in allWrapPanels)
-            {
-                wrapPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             }
         }
 
