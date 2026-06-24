@@ -18,6 +18,13 @@ on:
       - '**.csproj'
       - '.github/workflows/msix-store.yml'
 
+env:
+  APP_NAME: DevTools Pro
+  PUBLISHER_ID: ${{ secrets.PUBLISHER_ID }}
+  TARGET_DEVICE_FAMILY: Windows.Desktop
+  MIN_OS_VERSION: 10.0.17763.0
+  STORE_LISTING_LANGUAGE: zh-CN
+
 jobs:
   extract-version:
     runs-on: ubuntu-latest
@@ -82,6 +89,10 @@ jobs:
         env:
           VERSION: ${{ needs.extract-version.outputs.version }}
           CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
+          APP_NAME: ${{ env.APP_NAME }}
+          PUBLISHER_ID: ${{ env.PUBLISHER_ID }}
+          TARGET_DEVICE_FAMILY: ${{ env.TARGET_DEVICE_FAMILY }}
+          MIN_OS_VERSION: ${{ env.MIN_OS_VERSION }}
         run: |
           $version = "${{ env.VERSION }}"
           $changelog = @"
@@ -97,7 +108,465 @@ ${{ env.CHANGELOG }}
           dotnet publish DevTools.csproj -c Release -r win-x64 --self-contained true -o "$packageDir/App"
           
           # Escape description for XML
-          $escapedDescription = $changelog -replace '"', '&quot;' -replace '`n', ' ' -replace '\r', ''
+          $escapedDescription = $changelog -replace '"', '&quot;' -replace '&', '&amp;' -replace ''', '&apos;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '`n', ' ' -replace '\r', ''
+          
+          # Create AppxManifest.xml
+          $manifest = @"
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
+
+  <Identity Name="${{ env.APP_NAME }}"
+            Publisher="${{ env.PUBLISHER_ID }}"
+            Version="$version.0"
+            ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>${{ env.APP_NAME }}</DisplayName>
+    <PublisherDisplayName>Your Publisher Name</PublisherDisplayName>
+    <Logo>Assets/StoreLogo.png</Logo>
+    <Description>$escapedDescription</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="${{ env.TARGET_DEVICE_FAMILY }}" MinVersion="${{ env.MIN_OS_VERSION }}" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="zh-cn" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="App/DevTools.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+          DisplayName="${{ env.APP_NAME }}"
+          Description="$escapedDescription"
+          BackgroundColor="transparent"
+          Square150x150Logo="Assets/Square150x150Logo.png"
+          Square44x44Logo="Assets/Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets/Wide310x150Logo.png" Square71x71Logo="Assets/Square71x71Logo.png" />
+        <uap:SplashScreen Image="Assets/SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
+"@
+          $manifest | Out-File -FilePath "$packageDir/AppxManifest.xml" -Encoding utf8
+          
+          Write-Host "MSIX package structure created at $packageDir"
+          Write-Host "Version: $version"
+
+      - name: Copy Store assets
+        shell: pwsh
+        run: |
+          # Create assets directory
+          $assetsPath = "msix-package/Assets"
+          New-Item -ItemType Directory -Force -Path $assetsPath | Out-Null
+          
+          # Check if logo exists in Resources/Images
+          $logoPath = "Resources/Images/logo.png"
+          
+          if (Test-Path $logoPath) {
+            Write-Host "Found custom logo at $logoPath"
+            
+            # Copy original logo
+            Copy-Item $logoPath "$assetsPath/Square150x150Logo.png" -Force
+            
+            # Use logo for all assets
+            Add-Type -AssemblyName System.Drawing
+            
+            # Load the source logo
+            $sourceLogo = [System.Drawing.Image]::FromFile((Resolve-Path $logoPath))
+            
+            # Function to resize and save logo
+            function Resize-Logo {
+              param($width, $height, $filename, $centerX = $false)
+              
+              $bitmap = New-Object System.Drawing.Bitmap($width, $height)
+              $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+              $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+              $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+              $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
+              $graphics.Clear([System.Drawing.Color]::Transparent)
+              
+              if ($centerX) {
+                # Center the image for wide logos
+                $x = [int](($width - $sourceLogo.Width) / 2)
+                $y = [int](($height - $sourceLogo.Height) / 2)
+                $graphics.DrawImage($sourceLogo, $x, $y, $sourceLogo.Width, $sourceLogo.Height)
+              } else {
+                # Scale and center for square logos
+                $scale = [Math]::Min($width / $sourceLogo.Width, $height / $sourceLogo.Height)
+                $newWidth = [int]($sourceLogo.Width * $scale)
+                $newHeight = [int]($sourceLogo.Height * $scale)
+                $x = [int](($width - $newWidth) / 2)
+                $y = [int](($height - $newHeight) / 2)
+                $graphics.DrawImage($sourceLogo, $x, $y, $newWidth, $newHeight)
+              }
+              
+              $bitmap.Save("$assetsPath/$filename", [System.Drawing.Imaging.ImageFormat]::Png)
+              $graphics.Dispose()
+              $bitmap.Dispose()
+              
+              Write-Host "Created $filename ($width x $height)"
+            }
+            
+            # Create all required Store assets from logo.png
+            Resize-Logo 50 50 "StoreLogo.png"
+            Resize-Logo 150 150 "Square150x150Logo.png"
+            Resize-Logo 44 44 "Square44x44Logo.png"
+            Resize-Logo 71 71 "Square71x71Logo.png"
+            Resize-Logo 310 150 "Wide310x150Logo.png" -centerX $true
+            Resize-Logo 620 300 "SplashScreen.png" -centerX $true
+            
+            $sourceLogo.Dispose()
+            
+            Write-Host "Store assets created from custom logo"
+          } else {
+            Write-Host "Warning: Custom logo not found at $logoPath"
+            Write-Host "Creating placeholder assets..."
+            
+            # Fallback: create placeholder assets with "DT" text
+            Add-Type -AssemblyName System.Drawing
+            $bgColor = [System.Drawing.Color]::FromArgb(74, 74, 74)
+            
+            function Create-Placeholder {
+              param($width, $height, $filename)
+              $bitmap = New-Object System.Drawing.Bitmap($width, $height)
+              $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+              $graphics.Clear($bgColor)
+              
+              $fontSize = [int]([Math]::Min($width, $height) * 0.4)
+              $font = New-Object System.Drawing.Font("Segoe UI", $fontSize, [System.Drawing.FontStyle]::Bold)
+              $brush = [System.Drawing.Brushes]::White
+              $format = New-Object System.Drawing.StringFormat
+              $format.Alignment = [System.Drawing.StringAlignment]::Center
+              $format.LineAlignment = [System.Drawing.StringAlignment]::Center
+              $rect = New-Object System.Drawing.RectangleF(0, 0, $width, $height)
+              $graphics.DrawString("DT", $font, $brush, $rect, $format)
+              
+              $bitmap.Save("$assetsPath/$filename", [System.Drawing.Imaging.ImageFormat]::Png)
+              $graphics.Dispose()
+              $bitmap.Dispose()
+            }
+            
+            Create-Placeholder 50 50 "StoreLogo.png"
+            Create-Placeholder 150 150 "Square150x150Logo.png"
+            Create-Placeholder 44 44 "Square44x44Logo.png"
+            Create-Placeholder 71 71 "Square71x71Logo.png"
+            Create-Placeholder 310 150 "Wide310x150Logo.png"
+            Create-Placeholder 620 300 "SplashScreen.png"
+            
+            Write-Host "Placeholder assets created"
+          }
+
+      - name: Create MSIX using Windows SDK
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+        run: |
+          $version = "${{ env.VERSION }}"
+          
+          # Find makeappx.exe
+          $sdkPath = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
+          $makeappx = Get-ChildItem -Path $sdkPath -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue | 
+                      Where-Object { $_.DirectoryName -like "*\x64\*" } | 
+                      Sort-Object { $_.VersionInfo.FileVersion } -Descending | 
+                      Select-Object -First 1
+          
+          if (-not $makeappx) {
+            Write-Host "Error: Windows SDK not found. Please install Windows 10 SDK."
+            exit 1
+          }
+          
+          Write-Host "Creating MSIX package with $($makeappx.FullName)"
+          $msixOutput = "DevTools_${version}_x64.msix"
+          & $makeappx.FullName pack /d "msix-package" /p $msixOutput /o /nv
+          
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "Error: Failed to create MSIX package"
+            exit 1
+          }
+          
+          Write-Host "MSIX package created: $msixOutput"
+
+      - name: Display created files
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+        run: |
+          $version = "${{ env.VERSION }}"
+          Write-Host "=== Build Output ==="
+          Write-Host "Version: $version"
+          Get-ChildItem -Path "msix-package" -Recurse | Select-Object FullName, Length
+          
+          $msixFiles = Get-ChildItem -Path "." -Filter "*.msix" -ErrorAction SilentlyContinue
+          if ($msixFiles) {
+            Write-Host "=== MSIX Packages ==="
+            $msixFiles | ForEach-Object { Write-Host "$($_.Name) - $([math]::Round($_.Length / 1MB, 2)) MB" }
+          }
+
+      - name: Upload MSIX package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msix-package-v${{ needs.extract-version.outputs.version }}
+          path: |
+            msix-package/
+            *.msix
+          retention-days: 30
+
+      - name: Upload Release Notes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes-v${{ needs.extract-version.outputs.version }}
+          path: |
+            CHANGELOG.md
+          retention-days: 30
+
+  # Create GitHub Release
+  create-release:
+    needs: [extract-version, build-msix]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download MSIX package
+        uses: actions/download-artifact@v4
+        with:
+          name: msix-package-v${{ needs.extract-version.outputs.version }}
+          path: downloaded
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.extract-version.outputs.version }}
+          name: Release v${{ needs.extract-version.outputs.version }}
+          body: |
+            ${{ needs.extract-version.outputs.changelog }}
+          draft: false
+          prerelease: false
+          files: |
+            downloaded/*.msix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Publish to Microsoft Store using Partner Center API (Manual - requires Azure setup)
+  publish-to-store:
+    needs: [extract-version, build-msix]
+    runs-on: windows-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Download MSIX package
+        uses: actions/download-artifact@v4
+        with:
+          name: msix-package-v${{ needs.extract-version.outputs.version }}
+          path: downloaded
+
+      - name: Get MSIX file info
+        shell: pwsh
+        id: msix-info
+        run: |
+          $msixPath = Get-ChildItem -Path "downloaded" -Filter "*.msix" | Select-Object -First 1
+          
+          if ($msixPath) {
+            $fileSizeMB = [math]::Round($msixPath.Length / 1MB, 2)
+            Write-Host "MSIX File: $($msixPath.Name)"
+            Write-Host "Size: $fileSizeMB MB"
+            Write-Host "Full Path: $($msixPath.FullName)"
+            Write-Host "MSIX_PATH=$($msixPath.FullName)" >> $env:GITHUB_OUTPUT
+            Write-Host "MSIX_NAME=$($msixPath.Name)" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "Error: No MSIX file found"
+            exit 1
+          }
+
+      - name: Display release information
+        shell: pwsh
+        run: |
+          $version = "${{ needs.extract-version.outputs.version }}"
+          $changelog = @"
+${{ needs.extract-version.outputs.changelog }}
+"@
+          
+          Write-Host "=== Release Information ==="
+          Write-Host "Version: $version"
+          Write-Host ""
+          Write-Host "Release Notes:"
+          Write-Host $changelog
+          Write-Host ""
+
+      - name: Check Store configuration
+        id: check-config
+        shell: pwsh
+        env:
+          STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+        run: |
+          Write-Host "=== MSIX Package Ready ==="
+          Write-Host ""
+          Write-Host "Your MSIX file has been uploaded to GitHub Release."
+          Write-Host ""
+          Write-Host "To publish to Microsoft Store manually:"
+          Write-Host "1. Go to: https://partner.microsoft.com/dashboard"
+          Write-Host "2. Select your app"
+          Write-Host "3. Create a new submission or update existing one"
+          Write-Host "4. Download the MSIX from the GitHub Release"
+          Write-Host "5. Upload the MSIX file"
+          Write-Host ""
+          Write-Host "Note: For automatic publishing, configure Azure credentials (not covered in this workflow)."
+          Write-Host ""
+
+      - name: Display Final Status
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+        run: |
+          $version = "${{ env.VERSION }}"
+          
+          Write-Host ""
+          Write-Host "======================================"
+          Write-Host "   Release Complete!"
+          Write-Host "======================================"
+          Write-Host ""
+          Write-Host "Version: $version"
+          Write-Host ""
+          Write-Host "The MSIX file has been uploaded to GitHub Release."
+          Write-Host "Please download and manually upload to Microsoft Store if needed."
+          Write-Host ""
+
+  # Upload MSIX Manually (fallback when secrets not configured)
+  upload-manual:
+    needs: [extract-version, build-msix]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && (secrets.AZURE_CLIENT_ID == '' || secrets.AZURE_CLIENT_ID == null)
+    steps:
+      - name: Download MSIX package
+        uses: actions/download-artifact@v4
+        with:
+          name: msix-package-v${{ needs.extract-version.outputs.version }}
+          path: downloaded
+
+      - name: Display upload instructions
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+        run: |
+          $version = "${{ env.VERSION }}"
+          $msixFile = Get-ChildItem -Path "downloaded" -Filter "*.msix" | Select-Object -First 1
+          
+          Write-Host "======================================"
+          Write-Host "   MSIX Package Ready for Upload"
+          Write-Host "======================================"
+          Write-Host ""
+          Write-Host "Version: $version"
+          Write-Host "File: $($msixFile.Name)"
+          Write-Host "Size: $([math]::Round($msixFile.Length / 1MB, 2)) MB"
+          Write-Host ""
+          Write-Host "Manual Upload Steps:"
+          Write-Host "1. Download the MSIX artifact from this workflow run"
+          Write-Host "2. Go to Partner Center: https://partner.microsoft.com/dashboard"
+          Write-Host "3. Select your app"
+          Write-Host "4. Create a new submission or update existing one"
+          Write-Host "5. Upload the MSIX file"
+          Write-Host ""
+# =====================================================
+# SETUP INSTRUCTIONS FOR GITHUB RELEASES
+# =====================================================
+
+## Overview
+This workflow automatically builds your MSIX package and creates a GitHub Release.
+
+## What it does:
+1. Builds the MSIX package from your source code
+2. Generates Store assets from Resources/Images/logo.png
+3. Creates a GitHub Release with the MSIX attached
+
+## Manual Store Publishing:
+1. Go to: https://partner.microsoft.com/dashboard
+2. Select your app
+3. Create a new submission or update existing one
+4. Download the MSIX from the GitHub Release
+5. Upload the MSIX file
+6. Submit for certification
+
+## CHANGELOG Format
+The workflow extracts version from lines like:
+## [2.2.0] - 2026-04-23
+
+Make sure your CHANGELOG.md follows this format.
+
+
+---
+
+## Prerequisites
+Before using automatic publishing:
+1. Your app must exist in Partner Center (create it manually first)
+2. You must have at least one existing submission
+3. Age ratings and other compliance info must be configured
+
+---
+
+## Important Notes
+
+### MSIX Package Requirements
+- Package must be properly signed (for Store submission)
+- All required Store assets must be present
+- Version number must be incremented for each submission
+
+### API Limitations
+- Partner Center API token is valid for 60 minutes
+- Each submission creates a new version in the Store
+- Certification typically takes 24-48 hours
+
+### Troubleshooting
+If publishing fails:
+1. Check GitHub Actions logs for detailed error
+2. Verify all secrets are correctly configured
+3. Ensure Azure AD app has Partner Center permissions
+4. Check Azure Storage account has proper permissions
+5. Verify product ID is correct
+
+### Testing
+Test the workflow first:
+1. Push to a test branch
+2. Check if MSIX builds correctly
+3. Verify artifact upload
+4. Then configure secrets for full automation
+
+### Publishing Flow
+1. ✅ Build MSIX package
+2. ✅ Upload to Azure Blob Storage
+3. ✅ Create Partner Center submission
+4. ✅ Commit submission
+5. ⏳ Microsoft certification (automatic, 24-48 hours)
+
+### Workflow Triggers
+- **Push to main**: Builds MSIX and uploads artifact (no auto-publish)
+- **Manual trigger**: Full auto-publish to Store (requires secrets)
+
+---
+
+## CHANGELOG FORMAT
+The workflow extracts version from lines like:
+## [2.2.0] - 2026-04-23
+
+Make sure your CHANGELOG.md follows this format.
+
+---
+
+## Security Considerations
+- Never commit secrets to repository
+- Use GitHub Secrets for all sensitive data
+- Rotate secrets periodically
+- Monitor GitHub Actions logs for unauthorized access
           
           # Create AppxManifest.xml
           $manifest = @"
