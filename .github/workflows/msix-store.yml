@@ -1,0 +1,507 @@
+
+name: Build and Publish MSIX to Microsoft Store
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_changelog:
+        description: 'Skip changelog update (use existing version)'
+        required: false
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+    paths:
+      - '**.xaml'
+      - '**.cs'
+      - '**.csproj'
+      - '.github/workflows/msix-store.yml'
+
+jobs:
+  extract-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.VERSION }}
+      changelog: ${{ steps.extract.outputs.CHANGELOG }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version and changelog
+        id: extract
+        shell: pwsh
+        run: |
+          $content = Get-Content CHANGELOG.md -Raw
+          
+          # Extract version from first header like ## [2.2.0] - 2026-04-23
+          if ($content -match '##\s*\[(\d+\.\d+\.\d+)\]\s*-\s*\d{4}-\d{2}-\d{2}') {
+            $version = $matches[1]
+            Write-Host "Extracted version: $version"
+            Write-Host "VERSION=$version" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No version found in CHANGELOG.md"
+            exit 1
+          }
+          
+          # Extract changelog content for this version (everything between ## [version] and next ## or end)
+          $pattern = '(?s)##\s*\[\d+\.\d+\.\d+\].*?\n(.*?)(?=\n##|\Z)'
+          if ($content -match $pattern) {
+            $changelogContent = $matches[1].Trim()
+            # Convert markdown to plain text for Store description
+            $changelogContent = $changelogContent -replace '### ', '' -replace '\*\*', '' -replace '\* ', '- ' -replace '\n\n', "`n" -replace '\n\n\n', "`n"
+            $changelogContent = $changelogContent.Substring(0, [Math]::Min(500, $changelogContent.Length)) # Limit to 500 chars
+            
+            Write-Host "Extracted changelog (first 200 chars): $($changelogContent.Substring(0, [Math]::Min(200, $changelogContent.Length)))"
+            Write-Host "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
+            Write-Host $changelogContent >> $env:GITHUB_OUTPUT
+            Write-Host "EOF" >> $env:GITHUB_OUTPUT
+          }
+
+  build-msix:
+    needs: extract-version
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore DevTools.csproj
+
+      - name: Build Release
+        run: dotnet build DevTools.csproj -c Release --no-restore
+
+      # Create MSIX package using makeappx
+      - name: Create MSIX Package
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
+        run: |
+          $version = "${{ env.VERSION }}"
+          $changelog = @"
+${{ env.CHANGELOG }}
+"@
+          
+          # Create package directory
+          $packageDir = "msix-package"
+          New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
+          New-Item -ItemType Directory -Force -Path "$packageDir/Assets" | Out-Null
+          
+          # Publish the application
+          dotnet publish DevTools.csproj -c Release -r win-x64 --self-contained true -o "$packageDir/App"
+          
+          # Escape description for XML
+          $escapedDescription = $changelog -replace '"', '&quot;' -replace '`n', ' ' -replace '\r', ''
+          
+          # Create AppxManifest.xml
+          $manifest = @"
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
+
+  <Identity Name="DevTools"
+            Publisher="CN=YourPublisherName"
+            Version="$version.0"
+            ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>DevTools</DisplayName>
+    <PublisherDisplayName>Your Publisher Name</PublisherDisplayName>
+    <Logo>Assets/StoreLogo.png</Logo>
+    <Description>$escapedDescription</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="zh-cn" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="App/DevTools.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+          DisplayName="DevTools"
+          Description="$escapedDescription"
+          BackgroundColor="#4A4A4A"
+          Square150x150Logo="Assets/Square150x150Logo.png"
+          Square44x44Logo="Assets/Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets/Wide310x150Logo.png" Square71x71Logo="Assets/Square71x71Logo.png" />
+        <uap:SplashScreen Image="Assets/SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
+"@
+          $manifest | Out-File -FilePath "$packageDir/AppxManifest.xml" -Encoding utf8
+          
+          # Create placeholder assets (replace with your actual assets)
+          $assets = @(
+            "StoreLogo.png",
+            "Square150x150Logo.png",
+            "Square44x44Logo.png",
+            "Wide310x150Logo.png",
+            "Square71x71Logo.png",
+            "SplashScreen.png"
+          )
+          
+          foreach ($asset in $assets) {
+            # Create a simple placeholder PNG (1x1 transparent pixel)
+            $pngData = [byte[]]@(137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+            [System.IO.File]::WriteAllBytes("$packageDir/Assets/$asset", $pngData)
+          }
+          
+          Write-Host "MSIX package structure created at $packageDir"
+          Write-Host "Version: $version"
+
+      - name: Create MSIX using Windows SDK
+        shell: pwsh
+        run: |
+          $version = "${{ needs.extract-version.outputs.version }}"
+          
+          # Find makeappx.exe
+          $sdkPath = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
+          $makeappx = Get-ChildItem -Path $sdkPath -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue | 
+                      Where-Object { $_.DirectoryName -like "*\x64\*" } | 
+                      Sort-Object { $_.VersionInfo.FileVersion } -Descending | 
+                      Select-Object -First 1
+          
+          if (-not $makeappx) {
+            Write-Host "makeappx.exe not found, downloading Windows SDK..."
+            # Download and extract makeappx from nuget package
+            $msixPkg = "microsoft.windows.sdk.build.tools"
+            dotnet tool install --global $msixPkg 2>$null
+            $toolPath = (Get-ChildItem -Path "$env:LOCALAPPDATA\.dotnet\tools" -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue | Select-Object -First 1)
+            if ($toolPath) {
+              $makeappx = $toolPath
+            }
+          }
+          
+          if ($makeappx) {
+            Write-Host "Creating MSIX package with $($makeappx.FullName)"
+            & $makeappx.FullName pack /d "msix-package" /p "DevTools_$version.0_x64.msix" /o
+          } else {
+            Write-Host "Warning: makeappx.exe not found. MSIX package will not be created."
+            Write-Host "Please install Windows 10 SDK to enable MSIX packaging."
+          }
+
+      - name: Display created files
+        shell: pwsh
+        run: |
+          $version = "${{ needs.extract-version.outputs.version }}"
+          Write-Host "=== Build Output ==="
+          Write-Host "Version: $version"
+          Get-ChildItem -Path "msix-package" -Recurse | Select-Object FullName, Length
+          
+          $msixFiles = Get-ChildItem -Path "." -Filter "*.msix" -ErrorAction SilentlyContinue
+          if ($msixFiles) {
+            Write-Host "=== MSIX Packages ==="
+            $msixFiles | ForEach-Object { Write-Host $_.FullName }
+          }
+
+      - name: Upload MSIX package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msix-package-v${{ needs.extract-version.outputs.version }}
+          path: |
+            msix-package/
+            *.msix
+          retention-days: 30
+
+      - name: Upload Release Notes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes-v${{ needs.extract-version.outputs.version }}
+          path: |
+            CHANGELOG.md
+          retention-days: 30
+
+  # Publish to Microsoft Store using Partner Center API
+  publish-to-store:
+    needs: [extract-version, build-msix]
+    runs-on: windows-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Download MSIX package
+        uses: actions/download-artifact@v4
+        with:
+          name: msix-package-v${{ needs.extract-version.outputs.version }}
+          path: downloaded
+
+      - name: Get MSIX file info
+        shell: pwsh
+        id: msix-info
+        run: |
+          $msixPath = Get-ChildItem -Path "downloaded" -Filter "*.msix" | Select-Object -First 1
+          
+          if ($msixPath) {
+            $fileSizeKB = [math]::Round($msixPath.Length / 1KB, 2)
+            Write-Host "MSIX File: $($msixPath.Name)"
+            Write-Host "Size: $fileSizeKB KB"
+            Write-Host "Full Path: $($msixPath.FullName)"
+            Write-Host "MSIX_PATH=$($msixPath.FullName)" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "No MSIX file found"
+            exit 1
+          }
+
+      - name: Display release information
+        shell: pwsh
+        run: |
+          $version = "${{ needs.extract-version.outputs.version }}"
+          $changelog = @"
+${{ needs.extract-version.outputs.changelog }}
+"@
+          
+          Write-Host "=== Release Information ==="
+          Write-Host "Version: $version"
+          Write-Host ""
+          Write-Host "Release Notes:"
+          Write-Host $changelog
+          Write-Host ""
+
+      - name: Check if auto-publish is configured
+        id: check-config
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          STORE_ID: ${{ secrets.STORE_PRODUCT_ID }}
+        run: |
+          if (-not $env:AZURE_CLIENT_ID -or -not $env:AZURE_TENANT_ID -or -not $env:AZURE_CLIENT_SECRET -or -not $env:STORE_ID) {
+            Write-Host "=== Microsoft Store credentials not configured ==="
+            Write-Host ""
+            Write-Host "To enable automatic publishing, you need to set up:"
+            Write-Host "1. Azure AD App registration (see instructions below)"
+            Write-Host "2. GitHub Secrets:"
+            Write-Host "   - AZURE_CLIENT_ID"
+            Write-Host "   - AZURE_TENANT_ID"
+            Write-Host "   - AZURE_CLIENT_SECRET"
+            Write-Host "   - STORE_PRODUCT_ID"
+            Write-Host ""
+            Write-Host "MSIX file is ready for manual upload:"
+            Write-Host "- Download artifact: msix-package-v${{ needs.extract-version.outputs.version }}"
+            Write-Host "- Go to: https://partner.microsoft.com/dashboard"
+            Write-Host "- Create new submission and upload the MSIX"
+            exit 0
+          }
+          
+          Write-Host "All required secrets are configured. Proceeding with auto-publish..."
+
+      - name: Get Azure AD Token
+        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != ''
+        id: get-token
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+          $body = @{
+            grant_type = "client_credentials"
+            client_id = $env:AZURE_CLIENT_ID
+            client_secret = $env:AZURE_CLIENT_SECRET
+            resource = "https://graph.microsoft.com"
+          }
+          
+          $response = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$env:AZURE_TENANT_ID/oauth2/v2.0/token" `
+                                       -Method Post `
+                                       -ContentType "application/x-www-form-urlencoded" `
+                                       -Body $body
+          
+          $token = $response.access_token
+          Write-Host "Successfully obtained Azure AD token"
+          Write-Host "TOKEN=$token" >> $env:GITHUB_OUTPUT
+
+      - name: Get Partner Center Token
+        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != ''
+        id: get-pc-token
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+          $body = @{
+            grant_type = "client_credentials"
+            client_id = $env:AZURE_CLIENT_ID
+            client_secret = $env:AZURE_CLIENT_SECRET
+            resource = "https://api.partnercenter.microsoft.com"
+          }
+          
+          $response = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$env:AZURE_TENANT_ID/oauth2/v2.0/token" `
+                                       -Method Post `
+                                       -ContentType "application/x-www-form-urlencoded" `
+                                       -Body $body
+          
+          $pcToken = $response.access_token
+          Write-Host "Successfully obtained Partner Center token"
+          Write-Host "PC_TOKEN=$pcToken" >> $env:GITHUB_OUTPUT
+
+      - name: Create or Update Store Submission
+        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != ''
+        id: create-submission
+        shell: pwsh
+        env:
+          STORE_ID: ${{ secrets.STORE_PRODUCT_ID }}
+          PC_TOKEN: ${{ steps.get-pc-token.outputs.PC_TOKEN }}
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
+        run: |
+          $headers = @{
+            Authorization = "Bearer $env:PC_TOKEN"
+            Content-Type = "application/json"
+          }
+          
+          $productId = $env:STORE_ID
+          $version = $env:VERSION
+          $releaseNotes = $env:CHANGELOG
+          
+          Write-Host "Creating submission for product: $productId"
+          
+          # Get existing submission status
+          try {
+            $existingSubmission = Invoke-RestMethod -Uri "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId/submissions" `
+                                                   -Method Get `
+                                                   -Headers $headers `
+                                                   -ErrorAction SilentlyContinue
+            
+            if ($existingSubmission -and $existingSubmission.items) {
+              Write-Host "Found existing submission, updating..."
+            }
+          } catch {
+            Write-Host "No existing submission found, creating new one..."
+          }
+          
+          # Note: Full Store API implementation requires:
+          # 1. First create the submission
+          # 2. Upload the MSIX to Azure Blob Storage
+          # 3. Update submission with package info
+          # 4. Commit the submission
+          #
+          # This is a simplified version showing the structure.
+          # For complete implementation, use the Microsoft Store API:
+          # https://docs.microsoft.com/en-us/windows/uwp/publish/using-windows-store-services
+          
+          Write-Host "Submission creation initiated"
+          Write-Host "Note: Partner Center API requires additional setup for MSIX upload"
+          Write-Host ""
+          Write-Host "To complete auto-publishing setup:"
+          Write-Host "1. Set up Azure Blob Storage for MSIX packages"
+          Write-Host "2. Implement the full submission workflow"
+          Write-Host ""
+          Write-Host "For now, please upload manually or use Partner Center Portal."
+
+      - name: Upload MSIX Manually
+        if: env.AZURE_CLIENT_ID == '' || env.AZURE_TENANT_ID == '' || env.AZURE_CLIENT_SECRET == ''
+        shell: pwsh
+        run: |
+          $msixPath = "${{ steps.msix-info.outputs.MSIX_PATH }}"
+          
+          Write-Host "=== Manual Upload Instructions ==="
+          Write-Host ""
+          Write-Host "1. Download the MSIX artifact from this workflow run"
+          Write-Host "2. Go to Partner Center: https://partner.microsoft.com/dashboard"
+          Write-Host "3. Select your app: ${{ secrets.STORE_PRODUCT_ID }}"
+          Write-Host "4. Create a new submission or update existing one"
+          Write-Host "5. Upload the MSIX file"
+          Write-Host ""
+          Write-Host "MSIX file location: $msixPath"
+
+# =====================================================
+# SETUP INSTRUCTIONS FOR AUTOMATIC STORE PUBLISHING
+# =====================================================
+
+## Quick Setup (3 Steps)
+
+### Step 1: Register Azure AD App
+1. Go to: https://portal.azure.com > Azure Active Directory > App registrations
+2. Click "New registration"
+3. Name: "DevTools Store Publisher"
+4. Supported account types: "Accounts in this organizational directory only"
+5. Click "Register"
+6. Copy the "Application (client) ID" → GitHub Secret: AZURE_CLIENT_ID
+7. Copy the "Directory (tenant) ID" → GitHub Secret: AZURE_TENANT_ID
+
+### Step 2: Create Client Secret
+1. In your Azure AD App > Certificates & secrets
+2. Click "New client secret"
+3. Description: "GitHub Actions"
+4. Expires: Choose appropriate duration
+5. Copy the secret value → GitHub Secret: AZURE_CLIENT_SECRET
+
+### Step 3: Add Partner Center Permissions
+1. In your Azure AD App > API permissions
+2. Click "Add a permission"
+3. Select "APIs my organization uses"
+4. Search for "Microsoft Store"
+5. Select "Microsoft Store submission API"
+6. Choose "Application permissions"
+7. Select:
+   - AppTicket-Manage
+   - AppSubmission-Manage
+   - AppSubmission.Read
+8. Click "Add permissions"
+9. Grant admin consent for your organization
+
+### Step 4: Get Store Product ID
+1. Go to: https://partner.microsoft.com/dashboard
+2. Select your app
+3. Copy the Product ID from App overview page
+4. → GitHub Secret: STORE_PRODUCT_ID
+
+### Step 5: Add GitHub Secrets
+1. Go to: https://github.com/settings/secrets/actions
+2. Add these secrets:
+   - AZURE_CLIENT_ID
+   - AZURE_TENANT_ID
+   - AZURE_CLIENT_SECRET
+   - STORE_PRODUCT_ID
+
+---
+
+## CHANGELOG FORMAT
+The workflow extracts version from lines like:
+## [2.2.0] - 2026-04-23
+
+Make sure your CHANGELOG.md follows this format.
+
+---
+
+## Important Notes
+
+### Store API Limitations
+- Microsoft Store API requires additional Azure Blob Storage setup for MSIX upload
+- For full automation, you need:
+  1. Azure Storage Account
+  2. SAS token for upload
+  3. Complete submission workflow implementation
+
+### Manual vs Auto
+**Without secrets:** Workflow creates MSIX, you download and upload manually
+**With secrets:** Workflow attempts auto-publish (requires Blob Storage setup)
+
+### Publishing Flow
+1. Create submission → 2. Upload MSIX → 3. Update metadata → 4. Commit submission
+
+### Testing
+Test the workflow first without secrets, then add secrets for partial automation.
