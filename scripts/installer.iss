@@ -44,7 +44,7 @@ DisableProgramGroupPage=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "chinesesimplified"; MessagesFile: "scripts\ChineseSimplified.isl"
 
 [CustomMessages]
 english.AppDisplayName=DevTools
