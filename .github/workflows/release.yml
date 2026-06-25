@@ -190,9 +190,6 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Setup Windows SDK
-        uses: egor-tensin/setup-windows-sdk@v1
-
       - name: Update Package.appxmanifest
         shell: pwsh
         env:
