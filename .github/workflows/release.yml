@@ -177,7 +177,7 @@ jobs:
 
   build-msix:
     needs: extract-version
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -190,169 +190,47 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore DevTools.csproj
 
-      - name: Build Release
-        run: dotnet build DevTools.csproj -c Release --no-restore
-
-      - name: Build MSIX Package using WAP Project
+      - name: Update Package.appxmanifest
         shell: pwsh
         env:
           VERSION: ${{ needs.extract-version.outputs.version }}
-          CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
           PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
           DISPLAY_NAME: ${{ env.DISPLAY_NAME }}
           PUBLISHER_ID: ${{ env.PUBLISHER_ID }}
-          TARGET_DEVICE_FAMILY: ${{ env.TARGET_DEVICE_FAMILY }}
-          MIN_OS_VERSION: ${{ env.MIN_OS_VERSION }}
         run: |
           $version = "${{ env.VERSION }}"
           
-          # Validate version format
-          if ($version -notmatch '^\d+\.\d+\.\d+$') {
-            Write-Error "Invalid version format: $version. Expected format: 1.2.3"
-            exit 1
-          }
-          
-          # Update Package.appxmanifest with correct values
-          $manifestPath = "DevTools.Package/DevTools.Package.appxmanifest"
+          $manifestPath = "Package.appxmanifest"
           $manifestContent = Get-Content $manifestPath -Raw
           
-          # Replace placeholders with actual values
           $manifestContent = $manifestContent -replace '\$PACKAGE_NAME\$', "${{ env.PACKAGE_NAME }}"
           $manifestContent = $manifestContent -replace '\$PUBLISHER_ID\$', "${{ env.PUBLISHER_ID }}"
           $manifestContent = $manifestContent -replace '\$DISPLAY_NAME\$', "${{ env.DISPLAY_NAME }}"
           $manifestContent = $manifestContent -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"$version.0`""
           
-          # Write manifest with UTF-8 without BOM
-          [System.IO.File]::WriteAllText(
-              $manifestPath,
-              $manifestContent,
-              (New-Object System.Text.UTF8Encoding($false))
-          )
+          [System.IO.File]::WriteAllText($manifestPath, $manifestContent, (New-Object System.Text.UTF8Encoding($false)))
           
-          Write-Host "Updated manifest with:"
-          Write-Host "  Package Name: ${{ env.PACKAGE_NAME }}"
-          Write-Host "  Publisher: ${{ env.PUBLISHER_ID }}"
-          Write-Host "  Version: $version.0"
-          
-          # Publish app to a temp location first
-          dotnet publish DevTools.csproj -c Release -r win-x64 --self-contained true -o "publish/win-x64"
-          
-          # Copy published app to WAP project
-          $appDest = "DevTools.Package/App"
-          New-Item -ItemType Directory -Force -Path $appDest | Out-Null
-          Copy-Item -Path "publish/win-x64/*" -Destination $appDest -Recurse -Force
-          
-          Write-Host "Copied app to WAP project"
+          Write-Host "Updated manifest - Version: $version.0"
 
-      - name: Generate Store Assets
+      - name: Publish MSIX Package
+        run: |
+          dotnet publish DevTools.csproj `
+            -c Release `
+            -r win-x64 `
+            /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxBundle=Never
+
+      - name: Show output
         shell: pwsh
         run: |
-          $assetsPath = "DevTools.Package/Images"
-          New-Item -ItemType Directory -Force -Path $assetsPath | Out-Null
-          
-          $logoPath = "Resources/Images/logo.png"
-          
-          if (Test-Path $logoPath) {
-            Write-Host "Found custom logo at $logoPath"
-            
-            function Create-Image {
-              param($sourcePath, $destPath, $width, $height)
-              Add-Type -AssemblyName System.Drawing
-              $img = [System.Drawing.Image]::FromFile($sourcePath)
-              $newImg = New-Object System.Drawing.Bitmap($width, $height)
-              $graphics = [System.Drawing.Graphics]::FromImage($newImg)
-              $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
-              $graphics.DrawImage($img, 0, 0, $width, $height)
-              $newImg.Save($destPath, [System.Drawing.Imaging.ImageFormat]::Png)
-              $graphics.Dispose()
-              $newImg.Dispose()
-              $img.Dispose()
-              Write-Host "Created: $destPath ($width x $height)"
-            }
-            
-            Create-Image $logoPath "$assetsPath/StoreLogo.png" 50 50
-            Create-Image $logoPath "$assetsPath/Square150x150Logo.png" 150 150
-            Create-Image $logoPath "$assetsPath/Square44x44Logo.png" 44 44
-            Create-Image $logoPath "$assetsPath/Square71x71Logo.png" 71 71
-            Create-Image $logoPath "$assetsPath/Wide310x150Logo.png" 310 150
-            Create-Image $logoPath "$assetsPath/SplashScreen.png" 620 300
-            Create-Image $logoPath "$assetsPath/Square310x310Logo.png" 310 310
-          } else {
-            Write-Host "No custom logo found, using placeholder images"
-            function Create-Placeholder {
-              param($w, $h, $name)
-              Add-Type -AssemblyName System.Drawing
-              $bmp = New-Object System.Drawing.Bitmap($w, $h)
-              $graphics = [System.Drawing.Graphics]::FromImage($bmp)
-              $graphics.Clear([System.Drawing.Color]::FromArgb(64, 64, 64))
-              $font = New-Object System.Drawing.Font("Arial", [Math]::Min($w, $h) / 4)
-              $brush = [System.Drawing.Brushes]::White
-              $sf = New-Object System.Drawing.StringFormat
-              $sf.Alignment = [System.Drawing.StringAlignment]::Center
-              $sf.LineAlignment = [System.Drawing.StringAlignment]::Center
-              $rect = New-Object System.Drawing.RectangleF(0, 0, $w, $h)
-              $graphics.DrawString("DT", $font, $brush, $rect, $sf)
-              $bmp.Save("$assetsPath/$name", [System.Drawing.Imaging.ImageFormat]::Png)
-              $graphics.Dispose()
-              $bmp.Dispose()
-              Write-Host "Created placeholder: $name ($w x $h)"
-            }
-            Create-Placeholder 50 50 "StoreLogo.png"
-            Create-Placeholder 150 150 "Square150x150Logo.png"
-            Create-Placeholder 44 44 "Square44x44Logo.png"
-            Create-Placeholder 71 71 "Square71x71Logo.png"
-            Create-Placeholder 310 150 "Wide310x150Logo.png"
-            Create-Placeholder 620 300 "SplashScreen.png"
-            Create-Placeholder 310 310 "Square310x310Logo.png"
-          }
+          Write-Host "=== AppPackages ==="
+          Get-ChildItem AppPackages -Recurse -ErrorAction SilentlyContinue
 
-      - name: Build MSIXUpload with msbuild
-        shell: pwsh
-        env:
-          VERSION: ${{ needs.extract-version.outputs.version }}
-        run: |
-          $version = "${{ env.VERSION }}"
-          
-          # Find MSBuild
-          $vsPath = "C:\Program Files (x86)\Microsoft Visual Studio\Installer"
-          $msbuildPath = & "$vsPath\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
-          
-          if (-not $msbuildPath) {
-            Write-Host "MSBuild not found, trying default path"
-            $msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
-          }
-          
-          if (-not (Test-Path $msbuildPath)) {
-            Write-Host "Error: MSBuild not found at $msbuildPath"
-            exit 1
-          }
-          
-          Write-Host "Using MSBuild: $msbuildPath"
-          
-          # Build WAP project to generate .msixupload
-          $wapprojPath = "DevTools.Package\DevTools.Package.wapproj"
-          $outputPath = "artifacts\AppPackages"
-          
-          & $msbuildPath $wapprojPath `
-            /p:Configuration=Release `
-            /p:Platform=x64 `
-            /p:AppxPackageDir=$outputPath\ `
-            /p:UapAppxPackageBuildMode=StoreUpload `
-            /p:GenerateAppInstallerFile=false `
-            /p:AppxBundle=Never `
-            /p:AppxPackageSigningEnabled=false `
-            /t:Build `
-            /v:minimal
-          
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "Error: MSBuild failed"
-            exit 1
-          }
-          
-          Write-Host "MSIXUpload package created"
-          Get-ChildItem -Path $outputPath -Recurse | ForEach-Object {
-            Write-Host "$($_.Name) - $([math]::Round($_.Length / 1MB, 2)) MB"
-          }
+          Write-Host "=== bin ==="
+          Get-ChildItem bin -Recurse -Filter *.msix -ErrorAction SilentlyContinue
+
+          Write-Host "=== All MSIX files ==="
+          Get-ChildItem . -Recurse -Filter *.msix -ErrorAction SilentlyContinue | Select-Object FullName
 
       - name: Upload MSIX package
         if: success()
@@ -360,8 +238,7 @@ jobs:
         with:
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: |
-            artifacts/AppPackages/*.msixupload
-            artifacts/AppPackages/*.msix
+            **/*.msix
           retention-days: 30
 
   create-release:
@@ -411,7 +288,7 @@ jobs:
 
   publish-to-store:
     needs: [extract-version, build-msix]
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
       - name: Download MSIX package
         uses: actions/download-artifact@v4
@@ -419,13 +296,13 @@ jobs:
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: downloaded
 
-      - name: Find MSIXUpload
+      - name: Find MSIX package
         id: package
         shell: pwsh
         run: |
-          $file = Get-ChildItem downloaded -Recurse -Filter *.msixupload | Select-Object -First 1
+          $file = Get-ChildItem downloaded -Recurse -Filter *.msix | Select-Object -First 1
           if (-not $file) {
-            Write-Error "No .msixupload found in downloaded folder"
+            Write-Error "No .msix found in downloaded folder"
             Get-ChildItem downloaded -Recurse | ForEach-Object { Write-Host $_.FullName }
             exit 1
           }
