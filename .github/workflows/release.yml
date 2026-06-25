@@ -36,10 +36,13 @@ jobs:
         run: |
           $content = Get-Content CHANGELOG.md -Raw
           
+          # Normalize line endings
+          $content = $content -replace "`r`n", "`n"
+          
           if ($content -match '##\s*\[(\d+\.\d+\.\d+)\]\s*-\s*\d{4}-\d{2}-\d{2}') {
             $version = $matches[1]
             Write-Host "Extracted version: $version"
-            Write-Host "VERSION=$version" >> $env:GITHUB_OUTPUT
+            "VERSION=$version" >> $env:GITHUB_OUTPUT
           } else {
             Write-Host "No version found in CHANGELOG.md"
             exit 1
@@ -52,9 +55,9 @@ jobs:
             $changelogContent = $changelogContent.Substring(0, [Math]::Min(500, $changelogContent.Length))
             
             Write-Host "Extracted changelog (first 200 chars): $($changelogContent.Substring(0, [Math]::Min(200, $changelogContent.Length)))"
-            Write-Host "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
-            Write-Host $changelogContent >> $env:GITHUB_OUTPUT
-            Write-Host "EOF" >> $env:GITHUB_OUTPUT
+            "CHANGELOG<<EOF" >> $env:GITHUB_OUTPUT
+            $changelogContent >> $env:GITHUB_OUTPUT
+            "EOF" >> $env:GITHUB_OUTPUT
           }
 
   build-installer:
@@ -124,9 +127,9 @@ jobs:
           $langPath = Join-Path $innoPath "Languages"
           $chineseFile = Join-Path $langPath "ChineseSimplified.isl"
           
-          if (-not (Test-Path $chineseFile)) {
-            Write-Host "Downloading Chinese Simplified language file..."
-            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl" -OutFile $chineseFile
+          if (Test-Path $langPath) {
+            Write-Host "Inno Setup Languages folder exists"
+            Get-ChildItem $langPath -Filter "*.isl" | Select-Object -First 5 | ForEach-Object { Write-Host "  $($_.Name)" }
           }
         shell: pwsh
 
