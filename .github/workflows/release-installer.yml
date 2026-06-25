@@ -1,9 +1,10 @@
-name: Build and Release
+name: Build and Release (Deprecated)
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+
+# DEPRECATED: This workflow has been merged into release.yml
+# release.yml handles both installers and MSIX packages in a unified release process
 
 jobs:
   build-and-release:

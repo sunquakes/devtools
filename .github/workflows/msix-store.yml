@@ -335,31 +335,7 @@ ${{ env.CHANGELOG }}
           retention-days: 30
 
   # Create GitHub Release
-  create-release:
-    needs: [extract-version, build-msix]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download MSIX package
-        uses: actions/download-artifact@v4
-        with:
-          name: msix-package-v${{ needs.extract-version.outputs.version }}
-          path: downloaded
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ needs.extract-version.outputs.version }}
-          name: Release v${{ needs.extract-version.outputs.version }}
-          body: |
-            ${{ needs.extract-version.outputs.changelog }}
-          draft: false
-          prerelease: false
-          files: |
-            downloaded/*.msix
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Publish to Microsoft Store using Partner Center API (Manual - requires Azure setup)
+  # Publish to Microsoft Store (Auto - requires Azure setup)
   publish-to-store:
     needs: [extract-version, build-msix]
     runs-on: windows-latest
@@ -408,28 +384,179 @@ ${{ needs.extract-version.outputs.changelog }}
         id: check-config
         shell: pwsh
         env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
         run: |
-          Write-Host "=== MSIX Package Ready ==="
-          Write-Host ""
-          Write-Host "Your MSIX file has been uploaded to GitHub Release."
-          Write-Host ""
-          Write-Host "To publish to Microsoft Store manually:"
-          Write-Host "1. Go to: https://partner.microsoft.com/dashboard"
-          Write-Host "2. Select your app"
-          Write-Host "3. Create a new submission or update existing one"
-          Write-Host "4. Download the MSIX from the GitHub Release"
-          Write-Host "5. Upload the MSIX file"
-          Write-Host ""
-          Write-Host "Note: For automatic publishing, configure Azure credentials (not covered in this workflow)."
-          Write-Host ""
+          $hasAllSecrets = $env:AZURE_CLIENT_ID -and $env:AZURE_TENANT_ID -and $env:AZURE_CLIENT_SECRET -and $env:STORE_PRODUCT_ID
+          
+          if ($hasAllSecrets) {
+            Write-Host "All required secrets configured. Proceeding with auto-publish to Microsoft Store..."
+            Write-Host "Note: Microsoft provides temporary storage for file upload (no Azure Storage needed)"
+            Write-Host "::set-output name=AUTO_PUBLISH::true" 2>&1 || Write-Host "AUTO_PUBLISH=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "=== Microsoft Store secrets not fully configured ==="
+            Write-Host ""
+            Write-Host "Configured:"
+            Write-Host "  - AZURE_CLIENT_ID: $($env:AZURE_CLIENT_ID -ne $null)"
+            Write-Host "  - AZURE_TENANT_ID: $($env:AZURE_TENANT_ID -ne $null)"
+            Write-Host "  - AZURE_CLIENT_SECRET: $($env:AZURE_CLIENT_SECRET -ne $null)"
+            Write-Host "  - STORE_PRODUCT_ID: $($env:STORE_PRODUCT_ID -ne $null)"
+            Write-Host ""
+            Write-Host "Your MSIX file has been uploaded to GitHub Release."
+            Write-Host "Please configure the missing secrets for auto-publishing, or manually upload to Microsoft Store."
+            Write-Host "::set-output name=AUTO_PUBLISH::false" 2>&1 || Write-Host "AUTO_PUBLISH=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Get Azure AD Token
+        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != ''
+        id: get-token
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: |
+          $body = @{
+            grant_type = "client_credentials"
+            client_id = $env:AZURE_CLIENT_ID
+            client_secret = $env:AZURE_CLIENT_SECRET
+            scope = "https://api.partnercenter.microsoft.com/.default"
+          }
+          
+          $headers = @{
+            'Content-Type' = 'application/x-www-form-urlencoded'
+          }
+          
+          $tokenUrl = "https://login.microsoftonline.com/$env:AZURE_TENANT_ID/oauth2/v2.0/token"
+          $response = Invoke-RestMethod -Uri $tokenUrl -Method Post -Headers $headers -Body $body
+          
+          $pcToken = $response.access_token
+          Write-Host "Successfully obtained Partner Center token"
+          Write-Host "PC_TOKEN=$pcToken" >> $env:GITHUB_OUTPUT
+
+      - name: Create Store Submission and Upload MSIX
+        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != '' && env.STORE_PRODUCT_ID != ''
+        id: create-submission
+        shell: pwsh
+        env:
+          PC_TOKEN: ${{ steps.get-token.outputs.PC_TOKEN }}
+          STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
+          MSIX_PATH: ${{ steps.msix-info.outputs.MSIX_PATH }}
+        run: |
+          $headers = @{
+            Authorization = "Bearer ${{ env.PC_TOKEN }}"
+            'Content-Type' = 'application/json'
+          }
+          
+          $productId = "${{ env.STORE_PRODUCT_ID }}"
+          $version = "${{ env.VERSION }}"
+          $releaseNotes = "${{ env.CHANGELOG }}"
+          $msixPath = "${{ env.MSIX_PATH }}"
+          
+          Write-Host "Creating submission for product: $productId"
+          
+          try {
+            # Step 1: Get existing product info
+            $productUrl = "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId"
+            $product = Invoke-RestMethod -Uri $productUrl -Method Get -Headers $headers -ErrorAction Stop
+            
+            Write-Host "Product found: $($product.productName)"
+            
+            # Step 2: Create new submission (this returns Microsoft's upload URL)
+            $submissionUrl = "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId/submissions"
+            
+            $submissionBody = @{
+              applicationCategory = "developerTool"
+              listings = @{
+                "zh-CN" = @{
+                  description = $releaseNotes
+                  title = "DevTools Pro"
+                }
+                "en-US" = @{
+                  description = $releaseNotes
+                  title = "DevTools Pro"
+                }
+              }
+            } | ConvertTo-Json -Depth 10
+            
+            Write-Host "Creating submission..."
+            $submission = Invoke-RestMethod -Uri $submissionUrl -Method Post -Headers $headers -Body $submissionBody -ErrorAction Stop
+            
+            Write-Host "Submission created: $($submission.id)"
+            Write-Host "SUBMISSION_ID=$($submission.id)" >> $env:GITHUB_OUTPUT
+            
+            # Step 3: Get the file upload URL from Microsoft
+            # Microsoft provides a temporary Azure Blob Storage URL for file upload
+            $submissionDetailUrl = "$submissionUrl/$($submission.id)"
+            $submissionDetail = Invoke-RestMethod -Uri $submissionDetailUrl -Method Get -Headers $headers -ErrorAction Stop
+            
+            $uploadUrl = $submissionDetail.fileUploadUrl
+            
+            if (-not $uploadUrl) {
+              Write-Host "Warning: No file upload URL returned. Trying alternative method..."
+              
+              # Alternative: Request upload URL explicitly
+              $uploadRequestUrl = "$submissionDetailUrl/uploadurl"
+              $uploadInfo = Invoke-RestMethod -Uri $uploadRequestUrl -Method Post -Headers $headers -ErrorAction Stop
+              $uploadUrl = $uploadInfo.url
+            }
+            
+            if ($uploadUrl) {
+              Write-Host "Microsoft upload URL obtained: $uploadUrl"
+              
+              # Step 4: Upload MSIX to Microsoft's Azure Blob Storage
+              Write-Host "Uploading MSIX file..."
+              
+              $fileBytes = [System.IO.File]::ReadAllBytes($msixPath)
+              $uploadHeaders = @{
+                'x-ms-blob-type' = 'BlockBlob'
+                'Content-Type' = 'application/vnd.ms-appxpackage'
+                'x-ms-version' = '2021-06-08'
+              }
+              
+              Invoke-RestMethod -Uri $uploadUrl -Method Put -Headers $uploadHeaders -Body $fileBytes -ErrorAction Stop
+              Write-Host "MSIX uploaded successfully to Microsoft's storage!"
+              
+              # Step 5: Commit the submission
+              $commitUrl = "$submissionDetailUrl/commit"
+              $commitBody = @{
+                status = "Commit"
+              } | ConvertTo-Json
+              
+              Write-Host "Committing submission..."
+              Invoke-RestMethod -Uri $commitUrl -Method Post -Headers $headers -Body $commitBody -ErrorAction Stop
+              Write-Host "Submission committed successfully!"
+              
+              Write-Host "SUBMISSION_STATUS=Success" >> $env:GITHUB_OUTPUT
+              Write-Host "Your app has been submitted for certification."
+            } else {
+              Write-Host "Error: Could not obtain upload URL from Microsoft"
+              Write-Host "SUBMISSION_STATUS=Failed" >> $env:GITHUB_OUTPUT
+              exit 1
+            }
+            
+          } catch {
+            Write-Host "Error creating submission: $_"
+            Write-Host $_.Exception.Message
+            if ($_ | Get-Member -Name Response) {
+              Write-Host "Response: $($_.Response.Content)"
+            }
+            Write-Host "SUBMISSION_STATUS=Failed" >> $env:GITHUB_OUTPUT
+            exit 1
+          }
 
       - name: Display Final Status
         shell: pwsh
         env:
           VERSION: ${{ needs.extract-version.outputs.version }}
+          AUTO_PUBLISH: ${{ steps.check-config.outputs.AUTO_PUBLISH }}
         run: |
           $version = "${{ env.VERSION }}"
+          $autoPublish = "${{ env.AUTO_PUBLISH }}"
           
           Write-Host ""
           Write-Host "======================================"
@@ -438,20 +565,22 @@ ${{ needs.extract-version.outputs.changelog }}
           Write-Host ""
           Write-Host "Version: $version"
           Write-Host ""
-          Write-Host "The MSIX file has been uploaded to GitHub Release."
-          Write-Host "Please download and manually upload to Microsoft Store if needed."
+          
+          if ($autoPublish -eq "true") {
+            Write-Host "Status: Auto-published to Microsoft Store"
+            Write-Host ""
+            Write-Host "Your app has been submitted for certification."
+            Write-Host "Check status at: https://partner.microsoft.com/dashboard"
+          } else {
+            Write-Host "Status: MSIX uploaded to GitHub Release"
+            Write-Host ""
+            Write-Host "Please manually upload to Microsoft Store:"
+            Write-Host "1. Go to: https://partner.microsoft.com/dashboard"
+            Write-Host "2. Select your app"
+            Write-Host "3. Create/update submission"
+            Write-Host "4. Upload the MSIX file"
+          }
           Write-Host ""
-
-  # Upload MSIX Manually (fallback when secrets not configured)
-  upload-manual:
-    needs: [extract-version, build-msix]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && (secrets.AZURE_CLIENT_ID == '' || secrets.AZURE_CLIENT_ID == null)
-    steps:
-      - name: Download MSIX package
-        uses: actions/download-artifact@v4
-        with:
-          name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: downloaded
 
       - name: Display upload instructions
@@ -478,24 +607,67 @@ ${{ needs.extract-version.outputs.changelog }}
           Write-Host "5. Upload the MSIX file"
           Write-Host ""
 # =====================================================
-# SETUP INSTRUCTIONS FOR GITHUB RELEASES
+# SETUP INSTRUCTIONS FOR AUTO-PUBLISH TO MICROSOFT STORE
 # =====================================================
 
 ## Overview
-This workflow automatically builds your MSIX package and creates a GitHub Release.
+This workflow automatically:
+1. Builds the MSIX package from source code
+2. Creates a GitHub Release with the MSIX
+3. **Automatically publishes to Microsoft Store** (if configured)
+4. **Uses Microsoft's temporary storage** - No Azure Storage account needed!
 
-## What it does:
-1. Builds the MSIX package from your source code
-2. Generates Store assets from Resources/Images/logo.png
-3. Creates a GitHub Release with the MSIX attached
+## Required GitHub Secrets (Only 4 secrets!)
 
-## Manual Store Publishing:
-1. Go to: https://partner.microsoft.com/dashboard
+### 1. AZURE_CLIENT_ID
+Azure AD application client ID
+- Azure Portal > Azure Active Directory > App registrations > Your App > Overview
+
+### 2. AZURE_TENANT_ID
+Azure AD tenant ID
+- Azure Portal > Azure Active Directory > Overview > Tenant ID
+
+### 3. AZURE_CLIENT_SECRET
+Client secret for the Azure AD app
+- Azure Portal > Azure AD App > Certificates & secrets > New client secret
+
+### 4. STORE_PRODUCT_ID
+Your app's Product ID in Partner Center
+- Partner Center > Your App > Product ID (from URL or App overview)
+
+## Setup Steps
+
+### Step 1: Register Azure AD App
+1. Go to: https://portal.azure.com
+2. Azure Active Directory > App registrations > New registration
+3. Name: "DevTools Store Publisher"
+4. Supported account types: "Accounts in this organizational directory only"
+5. Click Register
+6. Copy **Application (client) ID** → GitHub Secret: AZURE_CLIENT_ID
+7. Copy **Directory (tenant) ID** → GitHub Secret: AZURE_TENANT_ID
+
+### Step 2: Create Client Secret
+1. In your Azure AD App > Certificates & secrets
+2. New client secret > Description: "GitHub Actions"
+3. Copy the secret value → GitHub Secret: AZURE_CLIENT_SECRET
+
+### Step 3: Add Partner Center API Permissions
+1. In your Azure AD App > API permissions
+2. Add a permission > APIs my organization uses
+3. Search "Microsoft Store submission API"
+4. Application permissions > Select:
+   - AppSubmission-Manage
+   - AppSubmission.Read
+5. Grant admin consent
+
+### Step 4: Get Store Product ID
+1. Partner Center: https://partner.microsoft.com/dashboard
 2. Select your app
-3. Create a new submission or update existing one
-4. Download the MSIX from the GitHub Release
-5. Upload the MSIX file
-6. Submit for certification
+3. Copy Product ID → GitHub Secret: STORE_PRODUCT_ID
+
+### Step 5: Add All Secrets
+1. GitHub > Settings > Secrets and variables > Actions
+2. Add each secret above
 
 ## CHANGELOG Format
 The workflow extracts version from lines like:
@@ -503,36 +675,62 @@ The workflow extracts version from lines like:
 
 Make sure your CHANGELOG.md follows this format.
 
+---
+
+## Workflow Behavior
+
+### Without secrets configured:
+- ✅ Builds MSIX
+- ✅ Creates GitHub Release
+- ⚠️ Manual upload to Store required
+
+### With all secrets configured:
+- ✅ Builds MSIX
+- ✅ Creates GitHub Release
+- ✅ Gets Microsoft's temporary upload URL (no Azure Storage needed!)
+- ✅ Uploads MSIX to Microsoft's storage
+- ✅ Creates Partner Center submission
+- ✅ Commits submission for certification
+
+---
+
+## Important: No Azure Storage Needed!
+
+Microsoft Partner Center API provides a **temporary Azure Blob Storage URL** for file upload when you create a submission. This means:
+- ❌ No need to create your own Azure Storage account
+- ❌ No need to configure storage secrets
+- ❌ No need to manage SAS URLs
+- ✅ Microsoft handles everything automatically!
 
 ---
 
 ## Prerequisites
 Before using automatic publishing:
-1. Your app must exist in Partner Center (create it manually first)
+1. Your app must exist in Partner Center (create manually first)
 2. You must have at least one existing submission
-3. Age ratings and other compliance info must be configured
+3. Age ratings and compliance info must be configured
+4. App must pass Store certification requirements
 
 ---
 
 ## Important Notes
 
 ### MSIX Package Requirements
-- Package must be properly signed (for Store submission)
+- Package must be properly signed
 - All required Store assets must be present
 - Version number must be incremented for each submission
 
 ### API Limitations
-- Partner Center API token is valid for 60 minutes
-- Each submission creates a new version in the Store
+- Partner Center API token valid for 60 minutes
+- Each submission creates new Store version
 - Certification typically takes 24-48 hours
 
 ### Troubleshooting
 If publishing fails:
-1. Check GitHub Actions logs for detailed error
+1. Check GitHub Actions logs for errors
 2. Verify all secrets are correctly configured
 3. Ensure Azure AD app has Partner Center permissions
-4. Check Azure Storage account has proper permissions
-5. Verify product ID is correct
+4. Verify product ID is correct
 
 ### Testing
 Test the workflow first:
@@ -543,24 +741,15 @@ Test the workflow first:
 
 ### Publishing Flow
 1. ✅ Build MSIX package
-2. ✅ Upload to Azure Blob Storage
-3. ✅ Create Partner Center submission
-4. ✅ Commit submission
-5. ⏳ Microsoft certification (automatic, 24-48 hours)
+2. ✅ Create Partner Center submission
+3. ✅ Get Microsoft's upload URL (automatic)
+4. ✅ Upload MSIX to Microsoft's storage
+5. ✅ Commit submission
+6. ⏳ Microsoft certification (automatic, 24-48 hours)
 
 ### Workflow Triggers
 - **Push to main**: Builds MSIX and uploads artifact (no auto-publish)
-- **Manual trigger**: Full auto-publish to Store (requires secrets)
-
----
-
-## CHANGELOG FORMAT
-The workflow extracts version from lines like:
-## [2.2.0] - 2026-04-23
-
-Make sure your CHANGELOG.md follows this format.
-
----
+- **Manual trigger**: Full auto-publish to Store (requires all secrets)
 
 ## Security Considerations
 - Never commit secrets to repository
