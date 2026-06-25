@@ -212,13 +212,9 @@ jobs:
           
           Write-Host "Updated manifest - Version: $version.0"
 
-      - name: Publish MSIX Package
-        run: |
-          dotnet publish DevTools.csproj `
-            -c Release `
-            -r win-x64 `
-            /p:GenerateAppxPackageOnBuild=true `
-            /p:AppxBundle=Never
+      - name: Build and generate MSIX
+        run: msbuild DevTools.csproj /t:Build /p:Configuration=Release
+        shell: pwsh
 
       - name: Show output
         shell: pwsh
