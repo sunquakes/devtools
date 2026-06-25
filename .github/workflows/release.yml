@@ -187,8 +187,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore DevTools.csproj
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup Windows SDK
+        uses: egor-tensin/setup-windows-sdk@v1
 
       - name: Update Package.appxmanifest
         shell: pwsh
@@ -198,22 +201,22 @@ jobs:
           DISPLAY_NAME: ${{ env.DISPLAY_NAME }}
           PUBLISHER_ID: ${{ env.PUBLISHER_ID }}
         run: |
-          $version = "${{ env.VERSION }}"
-          
           $manifestPath = "Package.appxmanifest"
           $manifestContent = Get-Content $manifestPath -Raw
-          
           $manifestContent = $manifestContent -replace '\$PACKAGE_NAME\$', "${{ env.PACKAGE_NAME }}"
           $manifestContent = $manifestContent -replace '\$PUBLISHER_ID\$', "${{ env.PUBLISHER_ID }}"
           $manifestContent = $manifestContent -replace '\$DISPLAY_NAME\$', "${{ env.DISPLAY_NAME }}"
-          $manifestContent = $manifestContent -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"$version.0`""
-          
-          [System.IO.File]::WriteAllText($manifestPath, $manifestContent, (New-Object System.Text.UTF8Encoding($false)))
-          
-          Write-Host "Updated manifest - Version: $version.0"
+          $manifestContent = $manifestContent -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"${{ env.VERSION }}.0`""
+          Set-Content $manifestPath -Value $manifestContent -Encoding UTF8
+
+      - name: Dump MSBuild properties
+        shell: pwsh
+        run: |
+          msbuild DevTools.csproj /pp:expanded.xml
+          Select-String -Path expanded.xml -Pattern "GenerateAppxPackageOnBuild|WindowsPackageType|EnableMsixTooling"
 
       - name: Build and generate MSIX
-        run: msbuild DevTools.csproj /t:Build /p:Configuration=Release
+        run: msbuild DevTools.csproj /p:Configuration=Release /p:GenerateAppxPackageOnBuild=true /p:UapAppxPackageBuildMode=StoreUpload
         shell: pwsh
 
       - name: Show output
@@ -222,11 +225,11 @@ jobs:
           Write-Host "=== AppPackages ==="
           Get-ChildItem AppPackages -Recurse -ErrorAction SilentlyContinue
 
-          Write-Host "=== bin ==="
-          Get-ChildItem bin -Recurse -Filter *.msix -ErrorAction SilentlyContinue
-
           Write-Host "=== All MSIX files ==="
           Get-ChildItem . -Recurse -Filter *.msix -ErrorAction SilentlyContinue | Select-Object FullName
+
+          Write-Host "=== All msixupload files ==="
+          Get-ChildItem . -Recurse -Filter *.msixupload -ErrorAction SilentlyContinue | Select-Object FullName
 
       - name: Upload MSIX package
         if: success()
@@ -235,6 +238,7 @@ jobs:
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: |
             **/*.msix
+            **/*.msixupload
           retention-days: 30
 
   create-release:
@@ -277,8 +281,6 @@ jobs:
             installer/DevTools-win-x64.exe
             installer/DevTools-win-arm64.exe
             installer/*.exe
-            msix/*.msixupload
-            msix/*.msix
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -296,9 +298,9 @@ jobs:
         id: package
         shell: pwsh
         run: |
-          $file = Get-ChildItem downloaded -Recurse -Filter *.msix | Select-Object -First 1
+          $file = Get-ChildItem downloaded -Recurse | Where-Object { $_.Extension -in '.msixupload', '.msix' } | Select-Object -First 1
           if (-not $file) {
-            Write-Error "No .msix found in downloaded folder"
+            Write-Error "No .msix or .msixupload found in downloaded folder"
             Get-ChildItem downloaded -Recurse | ForEach-Object { Write-Host $_.FullName }
             exit 1
           }
