@@ -187,8 +187,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+      - name: Clean and Restore dependencies
+        run: |
+          dotnet clean DevTools.csproj -c Release
+          dotnet restore DevTools.csproj -p:Configuration=Release
 
       - name: Update Package.appxmanifest
         shell: pwsh
@@ -209,11 +211,11 @@ jobs:
       - name: Dump MSBuild properties
         shell: pwsh
         run: |
-          msbuild DevTools.csproj /pp:expanded.xml
+          dotnet msbuild DevTools.csproj /pp:expanded.xml
           Select-String -Path expanded.xml -Pattern "GenerateAppxPackageOnBuild|WindowsPackageType|EnableMsixTooling"
 
       - name: Build and generate MSIX
-        run: msbuild DevTools.csproj /p:Configuration=Release /p:GenerateAppxPackageOnBuild=true /p:UapAppxPackageBuildMode=StoreUpload
+        run: dotnet msbuild DevTools.csproj /p:Configuration=Release /p:GenerateAppxPackageOnBuild=true /p:UapAppxPackageBuildMode=StoreUpload
         shell: pwsh
 
       - name: Show output
