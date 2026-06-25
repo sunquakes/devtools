@@ -13,7 +13,8 @@ on:
         default: false
 
 env:
-  APP_NAME: DevTools Pro
+  PACKAGE_NAME: Sunquakes.DevToolsPro
+  DISPLAY_NAME: DevTools Pro
   PUBLISHER_ID: ${{ secrets.PUBLISHER_ID }}
   TARGET_DEVICE_FAMILY: Windows.Desktop
   MIN_OS_VERSION: 10.0.17763.0
@@ -199,87 +200,61 @@ jobs:
       - name: Build Release
         run: dotnet build DevTools.csproj -c Release --no-restore
 
-      - name: Create MSIX Package
+      - name: Build MSIX Package using WAP Project
         shell: pwsh
         env:
           VERSION: ${{ needs.extract-version.outputs.version }}
           CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
-          APP_NAME: ${{ env.APP_NAME }}
+          PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
+          DISPLAY_NAME: ${{ env.DISPLAY_NAME }}
           PUBLISHER_ID: ${{ env.PUBLISHER_ID }}
           TARGET_DEVICE_FAMILY: ${{ env.TARGET_DEVICE_FAMILY }}
           MIN_OS_VERSION: ${{ env.MIN_OS_VERSION }}
         run: |
           $version = "${{ env.VERSION }}"
-          $changelog = @"
-${{ env.CHANGELOG }}
-"@
           
-          $packageDir = "msix-package"
-          New-Item -ItemType Directory -Force -Path $packageDir | Out-Null
-          New-Item -ItemType Directory -Force -Path "$packageDir/Assets" | Out-Null
+          # Validate version format
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            Write-Error "Invalid version format: $version. Expected format: 1.2.3"
+            exit 1
+          }
           
-          dotnet publish DevTools.csproj -c Release -r win-x64 --self-contained true -o "$packageDir/App"
+          # Update Package.appxmanifest with correct values
+          $manifestPath = "DevTools.Package/DevTools.Package.appxmanifest"
+          $manifestContent = Get-Content $manifestPath -Raw
           
-          $escapedDescription = $changelog -replace '"', '&quot;' -replace '&', '&amp;' -replace ''', '&apos;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '`n', ' ' -replace '\r', ''
+          # Replace placeholders with actual values
+          $manifestContent = $manifestContent -replace '\$PACKAGE_NAME\$', "${{ env.PACKAGE_NAME }}"
+          $manifestContent = $manifestContent -replace '\$PUBLISHER_ID\$', "${{ env.PUBLISHER_ID }}"
+          $manifestContent = $manifestContent -replace '\$DISPLAY_NAME\$', "${{ env.DISPLAY_NAME }}"
+          $manifestContent = $manifestContent -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"$version.0`""
           
-          $manifest = @"
-<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-         IgnorableNamespaces="uap rescap">
-
-  <Identity Name="${{ env.APP_NAME }}"
-            Publisher="${{ env.PUBLISHER_ID }}"
-            Version="$version.0"
-            ProcessorArchitecture="x64" />
-
-  <Properties>
-    <DisplayName>${{ env.APP_NAME }}</DisplayName>
-    <PublisherDisplayName>Your Publisher Name</PublisherDisplayName>
-    <Logo>Assets/StoreLogo.png</Logo>
-    <Description>$escapedDescription</Description>
-  </Properties>
-
-  <Dependencies>
-    <TargetDeviceFamily Name="${{ env.TARGET_DEVICE_FAMILY }}" MinVersion="${{ env.MIN_OS_VERSION }}" MaxVersionTested="10.0.22621.0" />
-  </Dependencies>
-
-  <Resources>
-    <Resource Language="en-us" />
-    <Resource Language="zh-cn" />
-  </Resources>
-
-  <Applications>
-    <Application Id="App"
-                 Executable="App/DevTools.exe"
-                 EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements
-          DisplayName="${{ env.APP_NAME }}"
-          Description="$escapedDescription"
-          BackgroundColor="transparent"
-          Square150x150Logo="Assets/Square150x150Logo.png"
-          Square44x44Logo="Assets/Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets/Wide310x150Logo.png" Square71x71Logo="Assets/Square71x71Logo.png" />
-        <uap:SplashScreen Image="Assets/SplashScreen.png" />
-      </uap:VisualElements>
-    </Application>
-  </Applications>
-
-  <Capabilities>
-    <rescap:Capability Name="runFullTrust" />
-  </Capabilities>
-</Package>
-"@
-          $manifest | Out-File -FilePath "$packageDir/AppxManifest.xml" -Encoding utf8
+          # Write manifest with UTF-8 without BOM
+          [System.IO.File]::WriteAllText(
+              $manifestPath,
+              $manifestContent,
+              (New-Object System.Text.UTF8Encoding($false))
+          )
           
-          Write-Host "MSIX package structure created at $packageDir"
-          Write-Host "Version: $version"
+          Write-Host "Updated manifest with:"
+          Write-Host "  Package Name: ${{ env.PACKAGE_NAME }}"
+          Write-Host "  Publisher: ${{ env.PUBLISHER_ID }}"
+          Write-Host "  Version: $version.0"
+          
+          # Publish app to a temp location first
+          dotnet publish DevTools.csproj -c Release -r win-x64 --self-contained true -o "publish/win-x64"
+          
+          # Copy published app to WAP project
+          $appDest = "DevTools.Package/App"
+          New-Item -ItemType Directory -Force -Path $appDest | Out-Null
+          Copy-Item -Path "publish/win-x64/*" -Destination $appDest -Recurse -Force
+          
+          Write-Host "Copied app to WAP project"
 
-      - name: Copy Store assets
+      - name: Generate Store Assets
         shell: pwsh
         run: |
-          $assetsPath = "msix-package/Assets"
+          $assetsPath = "DevTools.Package/Images"
           New-Item -ItemType Directory -Force -Path $assetsPath | Out-Null
           
           $logoPath = "Resources/Images/logo.png"
@@ -287,142 +262,113 @@ ${{ env.CHANGELOG }}
           if (Test-Path $logoPath) {
             Write-Host "Found custom logo at $logoPath"
             
-            Copy-Item $logoPath "$assetsPath/Square150x150Logo.png" -Force
-            
-            Add-Type -AssemblyName System.Drawing
-            
-            $sourceLogo = [System.Drawing.Image]::FromFile((Resolve-Path $logoPath))
-            
-            function Resize-Logo {
-              param($width, $height, $filename, $centerX = $false)
-              
-              $bitmap = New-Object System.Drawing.Bitmap($width, $height)
-              $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+            function Create-Image {
+              param($sourcePath, $destPath, $width, $height)
+              Add-Type -AssemblyName System.Drawing
+              $img = [System.Drawing.Image]::FromFile($sourcePath)
+              $newImg = New-Object System.Drawing.Bitmap($width, $height)
+              $graphics = [System.Drawing.Graphics]::FromImage($newImg)
               $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
-              $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
-              $graphics.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
-              $graphics.Clear([System.Drawing.Color]::Transparent)
-              
-              if ($centerX) {
-                $x = [int](($width - $sourceLogo.Width) / 2)
-                $y = [int](($height - $sourceLogo.Height) / 2)
-                $graphics.DrawImage($sourceLogo, $x, $y, $sourceLogo.Width, $sourceLogo.Height)
-              } else {
-                $scale = [Math]::Min($width / $sourceLogo.Width, $height / $sourceLogo.Height)
-                $newWidth = [int]($sourceLogo.Width * $scale)
-                $newHeight = [int]($sourceLogo.Height * $scale)
-                $x = [int](($width - $newWidth) / 2)
-                $y = [int](($height - $newHeight) / 2)
-                $graphics.DrawImage($sourceLogo, $x, $y, $newWidth, $newHeight)
-              }
-              
-              $bitmap.Save("$assetsPath/$filename", [System.Drawing.Imaging.ImageFormat]::Png)
+              $graphics.DrawImage($img, 0, 0, $width, $height)
+              $newImg.Save($destPath, [System.Drawing.Imaging.ImageFormat]::Png)
               $graphics.Dispose()
-              $bitmap.Dispose()
-              
-              Write-Host "Created $filename ($width x $height)"
+              $newImg.Dispose()
+              $img.Dispose()
+              Write-Host "Created: $destPath ($width x $height)"
             }
             
-            Resize-Logo 50 50 "StoreLogo.png"
-            Resize-Logo 150 150 "Square150x150Logo.png"
-            Resize-Logo 44 44 "Square44x44Logo.png"
-            Resize-Logo 71 71 "Square71x71Logo.png"
-            Resize-Logo 310 150 "Wide310x150Logo.png" -centerX $true
-            Resize-Logo 620 300 "SplashScreen.png" -centerX $true
-            
-            $sourceLogo.Dispose()
-            
-            Write-Host "Store assets created from custom logo"
+            Create-Image $logoPath "$assetsPath/StoreLogo.png" 50 50
+            Create-Image $logoPath "$assetsPath/Square150x150Logo.png" 150 150
+            Create-Image $logoPath "$assetsPath/Square44x44Logo.png" 44 44
+            Create-Image $logoPath "$assetsPath/Square71x71Logo.png" 71 71
+            Create-Image $logoPath "$assetsPath/Wide310x150Logo.png" 310 150
+            Create-Image $logoPath "$assetsPath/SplashScreen.png" 620 300
+            Create-Image $logoPath "$assetsPath/Square310x310Logo.png" 310 310
           } else {
-            Write-Host "Warning: Custom logo not found at $logoPath"
-            Write-Host "Creating placeholder assets..."
-            
-            Add-Type -AssemblyName System.Drawing
-            $bgColor = [System.Drawing.Color]::FromArgb(74, 74, 74)
-            
+            Write-Host "No custom logo found, using placeholder images"
             function Create-Placeholder {
-              param($width, $height, $filename)
-              $bitmap = New-Object System.Drawing.Bitmap($width, $height)
-              $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
-              $graphics.Clear($bgColor)
-              
-              $fontSize = [int]([Math]::Min($width, $height) * 0.4)
-              $font = New-Object System.Drawing.Font("Segoe UI", $fontSize, [System.Drawing.FontStyle]::Bold)
+              param($w, $h, $name)
+              Add-Type -AssemblyName System.Drawing
+              $bmp = New-Object System.Drawing.Bitmap($w, $h)
+              $graphics = [System.Drawing.Graphics]::FromImage($bmp)
+              $graphics.Clear([System.Drawing.Color]::FromArgb(64, 64, 64))
+              $font = New-Object System.Drawing.Font("Arial", [Math]::Min($w, $h) / 4)
               $brush = [System.Drawing.Brushes]::White
-              $format = New-Object System.Drawing.StringFormat
-              $format.Alignment = [System.Drawing.StringAlignment]::Center
-              $format.LineAlignment = [System.Drawing.StringAlignment]::Center
-              $rect = New-Object System.Drawing.RectangleF(0, 0, $width, $height)
-              $graphics.DrawString("DT", $font, $brush, $rect, $format)
-              
-              $bitmap.Save("$assetsPath/$filename", [System.Drawing.Imaging.ImageFormat]::Png)
+              $sf = New-Object System.Drawing.StringFormat
+              $sf.Alignment = [System.Drawing.StringAlignment]::Center
+              $sf.LineAlignment = [System.Drawing.StringAlignment]::Center
+              $rect = New-Object System.Drawing.RectangleF(0, 0, $w, $h)
+              $graphics.DrawString("DT", $font, $brush, $rect, $sf)
+              $bmp.Save("$assetsPath/$name", [System.Drawing.Imaging.ImageFormat]::Png)
               $graphics.Dispose()
-              $bitmap.Dispose()
+              $bmp.Dispose()
+              Write-Host "Created placeholder: $name ($w x $h)"
             }
-            
             Create-Placeholder 50 50 "StoreLogo.png"
             Create-Placeholder 150 150 "Square150x150Logo.png"
             Create-Placeholder 44 44 "Square44x44Logo.png"
             Create-Placeholder 71 71 "Square71x71Logo.png"
             Create-Placeholder 310 150 "Wide310x150Logo.png"
             Create-Placeholder 620 300 "SplashScreen.png"
-            
-            Write-Host "Placeholder assets created"
+            Create-Placeholder 310 310 "Square310x310Logo.png"
           }
 
-      - name: Create MSIX using Windows SDK
+      - name: Build MSIXUpload with msbuild
         shell: pwsh
         env:
           VERSION: ${{ needs.extract-version.outputs.version }}
         run: |
           $version = "${{ env.VERSION }}"
           
-          $sdkPath = "${env:ProgramFiles(x86)}\Windows Kits\10\bin"
-          $makeappx = Get-ChildItem -Path $sdkPath -Recurse -Filter "makeappx.exe" -ErrorAction SilentlyContinue | 
-                      Where-Object { $_.DirectoryName -like "*\x64\*" } | 
-                      Sort-Object { $_.VersionInfo.FileVersion } -Descending | 
-                      Select-Object -First 1
+          # Find MSBuild
+          $vsPath = "C:\Program Files (x86)\Microsoft Visual Studio\Installer"
+          $msbuildPath = & "$vsPath\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
           
-          if (-not $makeappx) {
-            Write-Host "Error: Windows SDK not found. Please install Windows 10 SDK."
+          if (-not $msbuildPath) {
+            Write-Host "MSBuild not found, trying default path"
+            $msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
+          }
+          
+          if (-not (Test-Path $msbuildPath)) {
+            Write-Host "Error: MSBuild not found at $msbuildPath"
             exit 1
           }
           
-          Write-Host "Creating MSIX package with $($makeappx.FullName)"
-          $msixOutput = "DevTools_${version}_x64.msix"
-          & $makeappx.FullName pack /d "msix-package" /p $msixOutput /o /nv
+          Write-Host "Using MSBuild: $msbuildPath"
+          
+          # Build WAP project to generate .msixupload
+          $wapprojPath = "DevTools.Package\DevTools.Package.wapproj"
+          $outputPath = "artifacts\AppPackages"
+          
+          & $msbuildPath $wapprojPath `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:AppxPackageDir=$outputPath\ `
+            /p:UapAppxPackageBuildMode=StoreUpload `
+            /p:GenerateAppInstallerFile=false `
+            /p:AppxBundle=Never `
+            /p:AppxPackageSigningEnabled=false `
+            /t:Build `
+            /v:minimal
           
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "Error: Failed to create MSIX package"
+            Write-Host "Error: MSBuild failed"
             exit 1
           }
           
-          Write-Host "MSIX package created: $msixOutput"
-
-      - name: Display created files
-        shell: pwsh
-        env:
-          VERSION: ${{ needs.extract-version.outputs.version }}
-        run: |
-          $version = "${{ env.VERSION }}"
-          Write-Host "=== Build Output ==="
-          Write-Host "Version: $version"
-          Get-ChildItem -Path "msix-package" -Recurse | Select-Object FullName, Length
-          
-          $msixFiles = Get-ChildItem -Path "." -Filter "*.msix" -ErrorAction SilentlyContinue
-          if ($msixFiles) {
-            Write-Host "=== MSIX Packages ==="
-            $msixFiles | ForEach-Object { Write-Host "$($_.Name) - $([math]::Round($_.Length / 1MB, 2)) MB" }
+          Write-Host "MSIXUpload package created"
+          Get-ChildItem -Path $outputPath -Recurse | ForEach-Object {
+            Write-Host "$($_.Name) - $([math]::Round($_.Length / 1MB, 2)) MB"
           }
 
       - name: Upload MSIX package
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: |
-            msix-package/
-            *.msix
+            artifacts/AppPackages/*.msixupload
+            artifacts/AppPackages/*.msix
           retention-days: 30
 
   create-release:
@@ -465,6 +411,7 @@ ${{ env.CHANGELOG }}
             installer/DevTools-win-x64.exe
             installer/DevTools-win-arm64.exe
             installer/*.exe
+            msix/*.msixupload
             msix/*.msix
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -479,213 +426,41 @@ ${{ env.CHANGELOG }}
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: downloaded
 
-      - name: Get MSIX file info
+      - name: Find MSIXUpload
+        id: package
         shell: pwsh
-        id: msix-info
         run: |
-          $msixPath = Get-ChildItem -Path "downloaded" -Filter "*.msix" | Select-Object -First 1
-          
-          if ($msixPath) {
-            $fileSizeKB = [math]::Round($msixPath.Length / 1KB, 2)
-            Write-Host "MSIX File: $($msixPath.Name)"
-            Write-Host "Size: $fileSizeKB KB"
-            Write-Host "Full Path: $($msixPath.FullName)"
-            Write-Host "MSIX_PATH=$($msixPath.FullName)" >> $env:GITHUB_OUTPUT
-          } else {
-            Write-Host "No MSIX file found"
+          $file = Get-ChildItem downloaded -Recurse -Filter *.msixupload | Select-Object -First 1
+          if (-not $file) {
+            Write-Error "No .msixupload found in downloaded folder"
+            Get-ChildItem downloaded -Recurse | ForEach-Object { Write-Host $_.FullName }
             exit 1
           }
+          Write-Host "Found package: $($file.FullName)"
+          "PACKAGE=$($file.FullName)" >> $env:GITHUB_OUTPUT
 
-      - name: Display release information
+      - name: Verify package
         shell: pwsh
         run: |
-          $version = "${{ needs.extract-version.outputs.version }}"
-          $changelog = @"
-${{ needs.extract-version.outputs.changelog }}
-"@
-          
-          Write-Host "=== Release Information ==="
-          Write-Host "Version: $version"
-          Write-Host ""
-          Write-Host "Release Notes:"
-          Write-Host $changelog
-          Write-Host ""
-
-      - name: Check if auto-publish is configured
-        id: check-config
-        shell: pwsh
-        env:
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          STORE_ID: ${{ secrets.STORE_PRODUCT_ID }}
-        run: |
-          if (-not $env:AZURE_CLIENT_ID -or -not $env:AZURE_TENANT_ID -or -not $env:AZURE_CLIENT_SECRET -or -not $env:STORE_ID) {
-            Write-Host "=== Microsoft Store credentials not configured ==="
-            Write-Host ""
-            Write-Host "To enable automatic publishing, you need to set up:"
-            Write-Host "1. Azure AD App registration"
-            Write-Host "2. GitHub Secrets:"
-            Write-Host "   - AZURE_CLIENT_ID"
-            Write-Host "   - AZURE_TENANT_ID"
-            Write-Host "   - AZURE_CLIENT_SECRET"
-            Write-Host "   - STORE_PRODUCT_ID"
-            Write-Host ""
-            Write-Host "MSIX file is ready for manual upload:"
-            Write-Host "- Download artifact: msix-package-v${{ needs.extract-version.outputs.version }}"
-            Write-Host "- Go to: https://partner.microsoft.com/dashboard"
-            Write-Host "- Create new submission and upload the MSIX"
-            exit 0
-          }
-          
-          Write-Host "All required secrets are configured. Proceeding with auto-publish..."
-
-      - name: Get Partner Center Token
-        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != ''
-        id: get-pc-token
-        shell: pwsh
-        env:
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: |
-          $body = @{
-            grant_type = "client_credentials"
-            client_id = $env:AZURE_CLIENT_ID
-            client_secret = $env:AZURE_CLIENT_SECRET
-            resource = "https://api.partnercenter.microsoft.com"
-          }
-          
-          $response = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$env:AZURE_TENANT_ID/oauth2/v2.0/token" `
-                                       -Method Post `
-                                       -ContentType "application/x-www-form-urlencoded" `
-                                       -Body $body
-          
-          $pcToken = $response.access_token
-          Write-Host "Successfully obtained Partner Center token"
-          Write-Host "PC_TOKEN=$pcToken" >> $env:GITHUB_OUTPUT
-
-      - name: Create or Update Store Submission
-        if: env.AZURE_CLIENT_ID != '' && env.AZURE_TENANT_ID != '' && env.AZURE_CLIENT_SECRET != ''
-        id: create-submission
-        shell: pwsh
-        env:
-          STORE_ID: ${{ secrets.STORE_PRODUCT_ID }}
-          PC_TOKEN: ${{ steps.get-pc-token.outputs.PC_TOKEN }}
-          VERSION: ${{ needs.extract-version.outputs.version }}
-          CHANGELOG: ${{ needs.extract-version.outputs.changelog }}
-          MSIX_PATH: ${{ steps.msix-info.outputs.MSIX_PATH }}
-        run: |
-          $headers = @{
-            Authorization = "Bearer $env:PC_TOKEN"
-            Content-Type = "application/json"
-          }
-          
-          $productId = $env:STORE_ID
-          $version = $env:VERSION
-          $releaseNotes = $env:CHANGELOG
-          $msixPath = $env:MSIX_PATH
-          
-          Write-Host "=== Step 1: Get existing submission ==="
-          $submissionUrl = "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId/submissions"
-          
-          try {
-            $existingSubmissions = Invoke-RestMethod -Uri $submissionUrl -Method Get -Headers $headers -ErrorAction Stop
-            
-            if ($existingSubmissions.items -and $existingSubmissions.items.Count -gt 0) {
-              $latestSubmission = $existingSubmissions.items | Sort-Object -Property 'id' -Descending | Select-Object -First 1
-              Write-Host "Found existing submission: $($latestSubmission.id)"
-              
-              $cloneUrl = "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId/submissions/$($latestSubmission.id)/clone"
-              Write-Host "Cloning from existing submission..."
-              $newSubmission = Invoke-RestMethod -Uri $cloneUrl -Method Post -Headers $headers -ErrorAction Stop
-              
-              $submissionId = $newSubmission.id
-              $uploadUrl = $newSubmission.fileUploadUrl
-              Write-Host "New submission created: $submissionId"
-              Write-Host "Upload URL: $uploadUrl"
-            } else {
-              Write-Host "No existing submission found"
-              exit 1
-            }
-          } catch {
-            Write-Host "Error: Failed to get or clone submission - $_"
-            exit 1
-          }
-          
-          Write-Host "`n=== Step 2: Upload MSIX file ==="
-          $fileSize = (Get-Item $msixPath).Length
-          Write-Host "Uploading file: $msixPath"
-          Write-Host "File size: $fileSize bytes"
-          
-          try {
-            $uploadHeaders = @{
-              'x-ms-blob-type' = 'BlockBlob'
-            }
-            $fileContent = [System.IO.File]::ReadAllBytes($msixPath)
-            $uploadResponse = Invoke-RestMethod -Uri $uploadUrl -Method Put -Headers $uploadHeaders -Body $fileContent -ErrorAction Stop
-            Write-Host "Upload completed successfully"
-          } catch {
-            Write-Host "Error: Failed to upload MSIX file - $_"
-            exit 1
-          }
-          
-          Write-Host "`n=== Step 3: Update submission with package info ==="
-          $msixFileName = (Get-Item $msixPath).Name
-          
-          $updateBody = @{
-            applicationPackages = @(
-              @{
-                fileName = $msixFileName
-                fileStatus = "PendingUpload"
-              }
-            )
-            pricing = @{
-              isFree = $true
-            }
-            listings = @{
-              "zh-CN" = @{
-                description = $releaseNotes
-                releaseNotes = $releaseNotes
-                title = "DevTools Pro"
-              }
-            }
-          }
-          
-          try {
-            $updateUrl = "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId/submissions/$submissionId"
-            $updateResponse = Invoke-RestMethod -Uri $updateUrl -Method Patch -Headers $headers -Body ($updateBody | ConvertTo-Json -Depth 10) -ErrorAction Stop
-            Write-Host "Submission updated successfully"
-          } catch {
-            Write-Host "Error: Failed to update submission - $_"
-            exit 1
-          }
-          
-          Write-Host "`n=== Step 4: Commit submission ==="
-          try {
-            $commitUrl = "https://api.partnercenter.microsoft.com/v1.0/myproducts/$productId/submissions/$submissionId/commit"
-            $commitResponse = Invoke-RestMethod -Uri $commitUrl -Method Post -Headers $headers -ErrorAction Stop
-            Write-Host "`n=== Submission committed successfully! ==="
-            Write-Host "Submission ID: $submissionId"
-            Write-Host "Version: $version"
-            Write-Host "The submission is now pending Microsoft Store review."
-          } catch {
-            Write-Host "Error: Failed to commit submission - $_"
-            exit 1
+          Write-Host "=== Downloaded files ==="
+          Get-ChildItem downloaded -Recurse | ForEach-Object {
+            Write-Host "$($_.FullName) - $([math]::Round($_.Length / 1MB, 2)) MB"
           }
 
-      - name: Upload MSIX Manually
-        if: env.AZURE_CLIENT_ID == '' || env.AZURE_TENANT_ID == '' || env.AZURE_CLIENT_SECRET == ''
+      - name: Publish To Store
+        uses: microsoft/store-submission@v1
+        with:
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          app-id: ${{ secrets.STORE_PRODUCT_ID }}
+          package-path: ${{ steps.package.outputs.PACKAGE }}
+
+      - name: Display result
+        if: always()
         shell: pwsh
         run: |
-          $msixPath = "${{ steps.msix-info.outputs.MSIX_PATH }}"
-          
-          Write-Host "=== Manual Upload Instructions ==="
-          Write-Host ""
-          Write-Host "1. Download the MSIX artifact from this workflow run"
-          Write-Host "2. Go to Partner Center: https://partner.microsoft.com/dashboard"
-          Write-Host "3. Select your app: ${{ secrets.STORE_PRODUCT_ID }}"
-          Write-Host "4. Create a new submission or update existing one"
-          Write-Host "5. Upload the MSIX file"
-          Write-Host ""
-          Write-Host "MSIX file location: $msixPath"
+          Write-Host "=== Microsoft Store Submission ==="
+          Write-Host "Status: Completed"
+          Write-Host "Version: ${{ needs.extract-version.outputs.version }}"
+          Write-Host "The submission is now pending Microsoft Store review."

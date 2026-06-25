@@ -4,6 +4,53 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.3.0] - 2026-06-25
+
+### Added
+- **MSIX Packaging and Publishing** - Complete CI/CD pipeline for Microsoft Store
+  - Unified release workflow with GitHub Actions
+  - Automatic MSIX package generation using Windows Application Packaging Project
+  - GitHub Release with automatic changelog
+  - Microsoft Store auto-submission via `microsoft/store-submission` action
+- **Homepage Search** - Full-text search across all tools
+  - Category tabs organization (Encoding, Image, Data, Query)
+  - Real-time search filtering by tool name and tags
+  - Auto-select first matching tab on search
+- **District Code Search** - Query Chinese administrative division codes
+  - Full national district code database
+  - Search by district name
+  - Copy result functionality
+- **Multi-Language Support** - Complete i18n implementation
+  - English and Simplified Chinese (zh-CN) languages
+  - Language persistence setting
+  - All UI text internationalized
+- **Developer Documentation** - AGENTS development standards
+  - Git commit message rules
+  - Page structure templates
+  - i18n naming conventions
+
+### Changed
+- **Homepage Layout** - Restructured with 4-column grid
+  - Category tabs for tool organization
+  - Updated color scheme (#666666 nav, #6B7280 buttons)
+  - Improved search box styling
+- **File Naming** - Precise timestamp format
+  - `yyyyMMddHHmmssSSS` format for all saved files
+  - Secure filename processing
+- **UI Controls** - FontAwesome icons and interactions
+  - Replace text buttons with icon buttons
+  - Double-click to select all text in input fields
+- **VSCode Integration** - Debug and build configurations
+  - WPF debugging environment setup
+  - dotnet build tasks
+
+### Fixed
+- **Language Setting** - Proper restart logic
+  - Avoid false restart during initial setup
+  - Null/duplicate check for language selection
+
+---
+
 ## [2.2.0] - 2026-04-23
 
 ### Added
