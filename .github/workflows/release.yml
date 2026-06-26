@@ -213,12 +213,18 @@ jobs:
         id: find-msbuild
         shell: pwsh
         run: |
-          $msbuild = Get-ChildItem -Path "C:\Program Files (x86)\Microsoft Visual Studio" -Recurse -Filter "MSBuild.exe" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -match "\\Bin\\MSBuild\.exe$" } | Sort-Object { $_.FullName } -Descending | Select-Object -First 1
+          $msbuildPaths = @(
+            "C:\Program Files\Microsoft Visual Studio\2026\Enterprise\MSBuild\Current\Bin\MSBuild.exe",
+            "C:\Program Files\Microsoft Visual Studio\2026\Professional\MSBuild\Current\Bin\MSBuild.exe",
+            "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe",
+            "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe"
+          )
+          $msbuild = $msbuildPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
           if ($msbuild) {
-            Write-Host "MSBuild found: $($msbuild.FullName)"
-            "MSBUILD=$($msbuild.FullName)" >> $env:GITHUB_OUTPUT
+            Write-Host "MSBuild found: $msbuild"
+            "MSBUILD=$msbuild" >> $env:GITHUB_OUTPUT
           } else {
-            Write-Error "MSBuild not found"
+            Write-Error "MSBuild not found in expected locations"
             exit 1
           }
 
