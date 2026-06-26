@@ -194,7 +194,7 @@ jobs:
           if (Test-Path "DevTools.Package\obj") { Remove-Item -Recurse -Force "DevTools.Package\obj" }
 
       - name: Restore
-        run: dotnet restore DevTools.csproj
+        run: dotnet restore DevTools.csproj -r win-x64 -r win-x86 -r win-arm64
 
       - name: Update Package.appxmanifest
         shell: pwsh
@@ -234,6 +234,46 @@ jobs:
           msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
+      - name: Create MSIX bundle
+        shell: pwsh
+        run: |
+          $version = "${{ needs.extract-version.outputs.version }}"
+          $makeappx = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\makeappx.exe" | Sort-Object { $_.VersionInfo.FileVersion } -Descending | Select-Object -First 1
+
+          $msixFiles = @(
+            "AppPackages\x64\DevTools.Package_${version}.0_x64.msix",
+            "AppPackages\x86\DevTools.Package_${version}.0_x86.msix",
+            "AppPackages\arm64\DevTools.Package_${version}.0_arm64.msix"
+          )
+
+          $existingFiles = @()
+          foreach ($f in $msixFiles) {
+            if (Test-Path $f) {
+              $existingFiles += $f
+              Write-Host "Found: $f"
+            } else {
+              Write-Host "Missing: $f"
+            }
+          }
+
+          if ($existingFiles.Count -eq 0) {
+            Write-Host "No MSIX files found, listing all files..."
+            Get-ChildItem AppPackages -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+            exit 1
+          }
+
+          $bundlePath = "DevTools_${version}_bundle.msixbundle"
+          $inputFile = "bundle_input.txt"
+          $existingFiles | Set-Content $inputFile
+
+          Write-Host "Creating bundle: $bundlePath"
+          & $makeappx.FullName bundle /f $inputFile /p $bundlePath /o
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to create MSIX bundle"
+            exit 1
+          }
+          Write-Host "Bundle created: $bundlePath"
+
       - name: Show output
         shell: pwsh
         run: |
@@ -243,8 +283,8 @@ jobs:
           Write-Host "=== All MSIX files ==="
           Get-ChildItem . -Recurse -Filter *.msix -ErrorAction SilentlyContinue | Select-Object FullName
 
-          Write-Host "=== All msixupload files ==="
-          Get-ChildItem . -Recurse -Filter *.msixupload -ErrorAction SilentlyContinue | Select-Object FullName
+          Write-Host "=== All msixbundle files ==="
+          Get-ChildItem . -Recurse -Filter *.msixbundle -ErrorAction SilentlyContinue | Select-Object FullName
 
       - name: Upload MSIX package
         if: success()
@@ -252,8 +292,7 @@ jobs:
         with:
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: |
-            **/*.msix
-            **/*.msixupload
+            *.msixbundle
           retention-days: 30
 
   create-release:
@@ -287,8 +326,8 @@ jobs:
             - DevTools-win-x64.exe - Windows 64-bit installer
             - DevTools-win-arm64.exe - Windows ARM64 installer
             
-            ### MSIX Package
-            - DevTools_${{ needs.extract-version.outputs.version }}_x64.msix - Microsoft Store package
+            ### MSIX Bundle
+            - DevTools_${{ needs.extract-version.outputs.version }}_bundle.msixbundle - Microsoft Store package (includes x64, x86, arm64)
           draft: false
           prerelease: false
           files: |
@@ -296,6 +335,7 @@ jobs:
             installer/DevTools-win-x64.exe
             installer/DevTools-win-arm64.exe
             installer/*.exe
+            msix/*.msixbundle
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -309,17 +349,17 @@ jobs:
           name: msix-package-v${{ needs.extract-version.outputs.version }}
           path: downloaded
 
-      - name: Find MSIX package
+      - name: Find MSIX bundle
         id: package
         shell: pwsh
         run: |
-          $file = Get-ChildItem downloaded -Recurse | Where-Object { $_.Extension -in '.msixupload', '.msix' } | Select-Object -First 1
+          $file = Get-ChildItem downloaded -Recurse | Where-Object { $_.Extension -eq '.msixbundle' } | Select-Object -First 1
           if (-not $file) {
-            Write-Error "No .msix or .msixupload found in downloaded folder"
+            Write-Error "No .msixbundle found in downloaded folder"
             Get-ChildItem downloaded -Recurse | ForEach-Object { Write-Host $_.FullName }
             exit 1
           }
-          Write-Host "Found package: $($file.FullName)"
+          Write-Host "Found bundle: $($file.FullName)"
           "PACKAGE=$($file.FullName)" >> $env:GITHUB_OUTPUT
 
       - name: Verify package
