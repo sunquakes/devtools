@@ -209,41 +209,25 @@ jobs:
           $manifestContent = $manifestContent -replace '\$ARCHITECTURE\$', "x64"
           Set-Content $manifestPath -Value $manifestContent -Encoding UTF8
 
-      - name: Find MSBuild
-        id: find-msbuild
-        shell: pwsh
-        run: |
-          $msbuildPaths = @(
-            "C:\Program Files\Microsoft Visual Studio\2026\Enterprise\MSBuild\Current\Bin\MSBuild.exe",
-            "C:\Program Files\Microsoft Visual Studio\2026\Professional\MSBuild\Current\Bin\MSBuild.exe",
-            "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe",
-            "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe"
-          )
-          $msbuild = $msbuildPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-          if ($msbuild) {
-            Write-Host "MSBuild found: $msbuild"
-            "MSBUILD=$msbuild" >> $env:GITHUB_OUTPUT
-          } else {
-            Write-Error "MSBuild not found in expected locations"
-            exit 1
-          }
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build MSIX x64
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x64"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          & ${{ steps.find-msbuild.outputs.MSBUILD }} DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=AppPackages\x64\
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=AppPackages\x64\
         shell: pwsh
 
       - name: Build MSIX x86
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x86"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          & ${{ steps.find-msbuild.outputs.MSBUILD }} DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /p:AppxPackageDir=AppPackages\x86\
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /p:AppxPackageDir=AppPackages\x86\
         shell: pwsh
 
       - name: Build MSIX arm64
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="arm64"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          & ${{ steps.find-msbuild.outputs.MSBUILD }} DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\
         shell: pwsh
 
       - name: Show output
