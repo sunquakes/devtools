@@ -187,12 +187,11 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Clean and Restore dependencies
+      - name: Clean
         run: |
           dotnet clean DevTools.csproj -c Release
-          dotnet restore DevTools.csproj -r win-x64
-          dotnet restore DevTools.csproj -r win-x86
-          dotnet restore DevTools.csproj -r win-arm64
+          if (Test-Path "DevTools.Package\bin") { Remove-Item -Recurse -Force "DevTools.Package\bin" }
+          if (Test-Path "DevTools.Package\obj") { Remove-Item -Recurse -Force "DevTools.Package\obj" }
 
       - name: Update Package.appxmanifest
         shell: pwsh
@@ -217,19 +216,19 @@ jobs:
       - name: Build MSIX x64
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x64"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=AppPackages\x64\
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=AppPackages\x64\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
       - name: Build MSIX x86
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x86"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /p:AppxPackageDir=AppPackages\x86\
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /p:AppxPackageDir=AppPackages\x86\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
       - name: Build MSIX arm64
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="arm64"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
       - name: Show output
