@@ -193,6 +193,9 @@ jobs:
           if (Test-Path "DevTools.Package\bin") { Remove-Item -Recurse -Force "DevTools.Package\bin" }
           if (Test-Path "DevTools.Package\obj") { Remove-Item -Recurse -Force "DevTools.Package\obj" }
 
+      - name: Restore
+        run: dotnet restore DevTools.csproj
+
       - name: Update Package.appxmanifest
         shell: pwsh
         env:
