@@ -190,7 +190,9 @@ jobs:
       - name: Clean and Restore dependencies
         run: |
           dotnet clean DevTools.csproj -c Release
-          dotnet restore DevTools.csproj -p:Configuration=Release
+          dotnet restore DevTools.csproj -r win-x64
+          dotnet restore DevTools.csproj -r win-x86
+          dotnet restore DevTools.csproj -r win-arm64
 
       - name: Update Package.appxmanifest
         shell: pwsh
