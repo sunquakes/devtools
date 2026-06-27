@@ -52,13 +52,9 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DevTools.csproj">
-      <Name>DevTools</Name>
-      <IsAppxMainProject>true</IsAppxMainProject>
-      <SetTargetFramework>TargetFramework=net8.0-windows10.0.26100.0</SetTargetFramework>
-      <OutputType>WinExe</OutputType>
-      <TargetPath>DevTools.exe</TargetPath>
-    </ProjectReference>
+    <ApplicationReference Include="..\DevTools.csproj">
+      <TargetProject>DevTools</TargetProject>
+    </ApplicationReference>
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
 </Project>
