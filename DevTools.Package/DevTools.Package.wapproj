@@ -36,7 +36,7 @@
   <PropertyGroup>
     <ProjectGuid>a1b2c3d4-e5f6-7890-abcd-ef1234567890</ProjectGuid>
     <TargetPlatformVersion>10.0.26100.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.26100.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
@@ -56,7 +56,7 @@
       <Name>DevTools</Name>
       <IsAppxMainProject>true</IsAppxMainProject>
       <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
-      <SetTargetFramework>TargetFramework=net8.0-windows10.0.17763.0</SetTargetFramework>
+      <SetTargetFramework>TargetFramework=net8.0-windows10.0.26100.0</SetTargetFramework>
       <TargetPath>DevTools.exe</TargetPath>
     </ProjectReference>
   </ItemGroup>

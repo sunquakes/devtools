@@ -17,7 +17,7 @@ env:
   DISPLAY_NAME: DevTools Pro
   PUBLISHER_ID: ${{ secrets.PUBLISHER_ID }}
   TARGET_DEVICE_FAMILY: Windows.Desktop
-  MIN_OS_VERSION: 10.0.17763.0
+  MIN_OS_VERSION: 10.0.26100.0
   STORE_LISTING_LANGUAGE: zh-CN
 
 jobs:
@@ -220,17 +220,13 @@ jobs:
         shell: pwsh
         run: |
           $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
-          $installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe"
+          $installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
           
           Write-Host "VS Path: $vsPath"
           Write-Host "Installer: $installer"
           
-          # List current workloads
-          Write-Host "`n=== Current VS workloads ==="
-          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -all -format json | ConvertFrom-Json | ForEach-Object { $_.installationPath }
-          
-          Write-Host "`nInstalling UWP workload with setup.exe..."
-          $installArgs = "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Component.UWP.VC.ARM64 --passive --norestart --wait"
+          Write-Host "`nInstalling UWP workload..."
+          $installArgs = "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Component.UWP.VC.ARM64 --quiet --norestart --wait"
           Write-Host "Command: $installer $installArgs"
           
           $process = Start-Process -FilePath $installer -ArgumentList $installArgs -NoNewWindow -Wait -PassThru
@@ -251,6 +247,9 @@ jobs:
 
           Write-Host "`n=== DesignTime SDKs ==="
           Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\DesignTime\CommonConfiguration\Neutral" -ErrorAction SilentlyContinue | Select-Object Name
+
+          Write-Host "`n=== Check 10.0.26100.0 directory ==="
+          Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\10.0.26100.0" -ErrorAction SilentlyContinue | Select-Object Name
 
           Write-Host "`n=== All Windows Kits ==="
           Get-ChildItem "C:\Program Files (x86)\Windows Kits\10" -ErrorAction SilentlyContinue | Select-Object Name
