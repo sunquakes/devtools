@@ -220,15 +220,28 @@ jobs:
         shell: pwsh
         run: |
           $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
-          $installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
+          $installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\setup.exe"
           
           Write-Host "VS Path: $vsPath"
-          Write-Host "Installing UWP workload..."
+          Write-Host "Installer: $installer"
           
-          $args = "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Component.UWP.VC.ARM64 --quiet --norestart --wait"
-          Start-Process -FilePath $installer -ArgumentList $args -NoNewWindow -Wait
+          # List current workloads
+          Write-Host "`n=== Current VS workloads ==="
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -all -format json | ConvertFrom-Json | ForEach-Object { $_.installationPath }
           
-          Write-Host "UWP workload installation complete"
+          Write-Host "`nInstalling UWP workload with setup.exe..."
+          $installArgs = "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Component.UWP.VC.ARM64 --passive --norestart --wait"
+          Write-Host "Command: $installer $installArgs"
+          
+          $process = Start-Process -FilePath $installer -ArgumentList $installArgs -NoNewWindow -Wait -PassThru
+          Write-Host "Exit code: $($process.ExitCode)"
+          
+          if ($process.ExitCode -ne 0) {
+            Write-Warning "Installer exited with code $($process.ExitCode)"
+          }
+          
+          Write-Host "`n=== Checking UAP after install ==="
+          Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\Platforms\UAP" -ErrorAction SilentlyContinue | Select-Object Name
 
       - name: List Windows SDKs
         shell: pwsh

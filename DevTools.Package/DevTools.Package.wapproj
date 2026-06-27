@@ -55,6 +55,9 @@
     <ProjectReference Include="..\DevTools.csproj">
       <Name>DevTools</Name>
       <IsAppxMainProject>true</IsAppxMainProject>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+      <SetTargetFramework>TargetFramework=net8.0-windows10.0.17763.0</SetTargetFramework>
+      <TargetPath>DevTools.exe</TargetPath>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
