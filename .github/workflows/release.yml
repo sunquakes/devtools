@@ -216,6 +216,18 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: List Windows SDKs
+        shell: pwsh
+        run: |
+          Write-Host "=== UAP SDKs ==="
+          Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\Platforms\UAP" -ErrorAction SilentlyContinue | Select-Object Name
+
+          Write-Host "`n=== DesignTime SDKs ==="
+          Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\DesignTime\CommonConfiguration\Neutral" -ErrorAction SilentlyContinue | Select-Object Name
+
+          Write-Host "`n=== All Windows Kits ==="
+          Get-ChildItem "C:\Program Files (x86)\Windows Kits\10" -ErrorAction SilentlyContinue | Select-Object Name
+
       - name: Build MSIX x64
         run: |
           (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x64"' | Set-Content "DevTools.Package\Package.appxmanifest"
