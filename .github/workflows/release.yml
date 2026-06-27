@@ -216,6 +216,20 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Install UWP workload
+        shell: pwsh
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $installer = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe"
+          
+          Write-Host "VS Path: $vsPath"
+          Write-Host "Installing UWP workload..."
+          
+          $args = "modify --installPath `"$vsPath`" --add Microsoft.VisualStudio.Workload.Universal --add Microsoft.VisualStudio.Component.UWP.VC.ARM64 --quiet --norestart --wait"
+          Start-Process -FilePath $installer -ArgumentList $args -NoNewWindow -Wait
+          
+          Write-Host "UWP workload installation complete"
+
       - name: List Windows SDKs
         shell: pwsh
         run: |
@@ -230,19 +244,19 @@ jobs:
 
       - name: Build MSIX x64
         run: |
-          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x64"' | Set-Content "DevTools.Package\Package.appxmanifest"
+          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"' , 'ProcessorArchitecture="x64"' | Set-Content "DevTools.Package\Package.appxmanifest"
           msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=AppPackages\x64\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
       - name: Build MSIX x86
         run: |
-          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x86"' | Set-Content "DevTools.Package\Package.appxmanifest"
+          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"' , 'ProcessorArchitecture="x86"' | Set-Content "DevTools.Package\Package.appxmanifest"
           msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /p:AppxPackageDir=AppPackages\x86\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
       - name: Build MSIX arm64
         run: |
-          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="arm64"' | Set-Content "DevTools.Package\Package.appxmanifest"
+          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"' , 'ProcessorArchitecture="arm64"' | Set-Content "DevTools.Package\Package.appxmanifest"
           msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\ /t:Build /p:RestorePackages=true
         shell: pwsh
 
