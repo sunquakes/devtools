@@ -13,6 +13,9 @@
     <ApplicationIcon>Resources\Images\logo.ico</ApplicationIcon>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <RuntimeIdentifiers>win-x64;win-x86;win-arm64</RuntimeIdentifiers>
+    <EnableWindowsDesktopDeployment>true</EnableWindowsDesktopDeployment>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <WindowsPackageType>None</WindowsPackageType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,11 +23,7 @@
     <None Include="App.config" />
   </ItemGroup>
 
-  <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest">
-      <SubType>Designer</SubType>
-    </AppxManifest>
-  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
@@ -68,4 +67,47 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <Target Name="OverrideAlPlatformForArm64" BeforeTargets="GenerateSatelliteAssemblies">
+    <PropertyGroup Condition="'$(Platform)' == 'arm64' or '$(PlatformTarget)' == 'arm64' or '$(RuntimeIdentifier)' == 'win-arm64'">
+      <_OriginalPlatformTarget>$(PlatformTarget)</_OriginalPlatformTarget>
+      <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+  </Target>
+  <Target Name="RestorePlatformTarget" AfterTargets="GenerateSatelliteAssemblies">
+    <PropertyGroup Condition="'$(_OriginalPlatformTarget)' != ''">
+      <PlatformTarget>$(_OriginalPlatformTarget)</PlatformTarget>
+    </PropertyGroup>
+  </Target>
+  <Target Name="EnsureWapPublishAssets" AfterTargets="ResolvePackageAssets">
+    <Message Importance="high" Text="EnsureWapPublishAssets: RuntimeIdentifier=$(RuntimeIdentifier), Platform=$(Platform), PlatformTarget=$(PlatformTarget), ProjectAssetsFile=$(ProjectAssetsFile)" />
+    <PropertyGroup>
+      <_WapRuntimeIdentifier Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</_WapRuntimeIdentifier>
+      <_WapRuntimeIdentifier Condition="'$(_WapRuntimeIdentifier)' == '' and '$(Platform)' != ''">win-$(Platform)</_WapRuntimeIdentifier>
+      <_WapRuntimeIdentifier Condition="'$(_WapRuntimeIdentifier)' == '' and '$(PlatformTarget)' != ''">win-$(PlatformTarget)</_WapRuntimeIdentifier>
+    </PropertyGroup>
+    <Message Importance="high" Text="EnsureWapPublishAssets: _WapRuntimeIdentifier=$(_WapRuntimeIdentifier)" />
+    <MakeDir Directories="$(ProjectDir)obj\wappublish\$(_WapRuntimeIdentifier)" />
+    <Copy SourceFiles="$(ProjectAssetsFile)" DestinationFolder="$(ProjectDir)obj\wappublish\$(_WapRuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectAssetsFile)')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props" DestinationFolder="$(ProjectDir)obj\wappublish\$(_WapRuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets" DestinationFolder="$(ProjectDir)obj\wappublish\$(_WapRuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json" DestinationFolder="$(ProjectDir)obj\wappublish\$(_WapRuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json')" />
+    <Message Importance="high" Text="EnsureWapPublishAssets: Copied assets to $(ProjectDir)obj\wappublish\$(_WapRuntimeIdentifier)" />
+  </Target>
+  <Target Name="EnsureWapPublishAssetsAllPlatforms" AfterTargets="ResolvePackageAssets">
+    <MakeDir Directories="$(ProjectDir)obj\wappublish\win-x64" />
+    <MakeDir Directories="$(ProjectDir)obj\wappublish\win-x86" />
+    <MakeDir Directories="$(ProjectDir)obj\wappublish\win-arm64" />
+    <Copy SourceFiles="$(ProjectAssetsFile)" DestinationFolder="$(ProjectDir)obj\wappublish\win-x64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectAssetsFile)')" />
+    <Copy SourceFiles="$(ProjectAssetsFile)" DestinationFolder="$(ProjectDir)obj\wappublish\win-x86" SkipUnchangedFiles="true" Condition="Exists('$(ProjectAssetsFile)')" />
+    <Copy SourceFiles="$(ProjectAssetsFile)" DestinationFolder="$(ProjectDir)obj\wappublish\win-arm64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectAssetsFile)')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props" DestinationFolder="$(ProjectDir)obj\wappublish\win-x64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props" DestinationFolder="$(ProjectDir)obj\wappublish\win-x86" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props" DestinationFolder="$(ProjectDir)obj\wappublish\win-arm64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.props')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets" DestinationFolder="$(ProjectDir)obj\wappublish\win-x64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets" DestinationFolder="$(ProjectDir)obj\wappublish\win-x86" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets" DestinationFolder="$(ProjectDir)obj\wappublish\win-arm64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.g.targets')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json" DestinationFolder="$(ProjectDir)obj\wappublish\win-x64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json" DestinationFolder="$(ProjectDir)obj\wappublish\win-x86" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json')" />
+    <Copy SourceFiles="$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json" DestinationFolder="$(ProjectDir)obj\wappublish\win-arm64" SkipUnchangedFiles="true" Condition="Exists('$(ProjectDir)obj\$(MSBuildProjectFile).nuget.dgspec.json')" />
+  </Target>
 </Project>

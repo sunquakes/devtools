@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" InitialTargets="RestoreDevTools" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0'">
-    <VisualStudioVersion>15.0</VisualStudioVersion>
+    <VisualStudioVersion>17.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -30,21 +30,47 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup>
+    <WapProjPath Condition="'$(WapProjPath)'=='' and '$(MSBuildExtensionsPath32)'!=''">$(MSBuildExtensionsPath32)\Microsoft\DesktopBridge\</WapProjPath>
+    <WapProjPath Condition="'$(WapProjPath)'=='' and '$(VSInstallDir)'!=''">$(VSInstallDir)MSBuild\Microsoft\DesktopBridge\</WapProjPath>
     <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\</WapProjPath>
   </PropertyGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
   <PropertyGroup>
-    <ProjectGuid>a1b2c3d4-e5f6-7890-abcd-ef1234567890</ProjectGuid>
+    <ProjectGuid>{5C866C20-228F-4EE5-9CA1-49CA0DE26E4E}</ProjectGuid>
     <TargetPlatformVersion>10.0.26100.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.26100.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
     <AppxAutoIncrementPackageRevision>false</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>false</AppxSymbolPackageEnabled>
-    <GenerateTestArtifacts>false</GenerateTestArtifacts>
-    <AppxBundle>Never</AppxBundle>
+    <GenerateTestArtifacts>true</GenerateTestArtifacts>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <EntryPointProjectUniqueName>..\DevTools.csproj</EntryPointProjectUniqueName>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <_IsGeneratingAppxPackage>true</_IsGeneratingAppxPackage>
+    <PlatformTarget>$(Platform)</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <AppxBundle>Never</AppxBundle>
+    <AppxPackageArchitecture>x64</AppxPackageArchitecture>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x86'">
+    <AppxBundle>Never</AppxBundle>
+    <AppxPackageArchitecture>x86</AppxPackageArchitecture>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'arm64'">
+    <AppxBundle>Never</AppxBundle>
+    <AppxPackageArchitecture>arm64</AppxPackageArchitecture>
+    <RuntimeIdentifier>win-arm64</RuntimeIdentifier>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
+    <AppxHashAlgorithm>SHA256</AppxHashAlgorithm>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -52,9 +78,35 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationReference Include="..\DevTools.csproj">
-      <TargetProject>DevTools</TargetProject>
-    </ApplicationReference>
+    <Content Include="Images\StoreLogo.png" />
+    <Content Include="Images\Square150x150Logo.png" />
+    <Content Include="Images\Square44x44Logo.png" />
+    <Content Include="Images\Wide310x150Logo.png" />
+    <Content Include="Images\Square71x71Logo.png" />
+    <Content Include="Images\Square310x310Logo.png" />
+    <Content Include="Images\SplashScreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DevTools.csproj" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
+  <Target Name="RestoreDevTools">
+    <Message Importance="high" Text="RestoreDevTools: Platform=$(Platform), Configuration=$(Configuration)" />
+    <Exec Command="dotnet restore ..\DevTools.csproj" />
+  </Target>
+  <Target Name="BeforeBuild">
+    <Message Importance="high" Text="BeforeBuild: Platform=$(Platform), RuntimeIdentifier=$(RuntimeIdentifier), AppxPackageArchitecture=$(AppxPackageArchitecture)" />
+    <PropertyGroup>
+      <_RuntimeIdentifier Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</_RuntimeIdentifier>
+      <_RuntimeIdentifier Condition="'$(_RuntimeIdentifier)' == ''">win-$(Platform)</_RuntimeIdentifier>
+    </PropertyGroup>
+    <Message Importance="high" Text="BeforeBuild: _RuntimeIdentifier=$(_RuntimeIdentifier)" />
+    <Exec Command="dotnet restore ..\DevTools.csproj" />
+    <MakeDir Directories="..\obj\wappublish\$(_RuntimeIdentifier)" />
+    <Copy SourceFiles="..\obj\project.assets.json" DestinationFolder="..\obj\wappublish\$(_RuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('..\obj\project.assets.json')" />
+    <Copy SourceFiles="..\obj\DevTools.csproj.nuget.g.props" DestinationFolder="..\obj\wappublish\$(_RuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('..\obj\DevTools.csproj.nuget.g.props')" />
+    <Copy SourceFiles="..\obj\DevTools.csproj.nuget.g.targets" DestinationFolder="..\obj\wappublish\$(_RuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('..\obj\DevTools.csproj.nuget.g.targets')" />
+    <Copy SourceFiles="..\obj\DevTools.csproj.nuget.dgspec.json" DestinationFolder="..\obj\wappublish\$(_RuntimeIdentifier)" SkipUnchangedFiles="true" Condition="Exists('..\obj\DevTools.csproj.nuget.dgspec.json')" />
+    <Message Importance="high" Text="BeforeBuild: Copied files to ..\obj\wappublish\$(_RuntimeIdentifier)" />
+  </Target>
 </Project>

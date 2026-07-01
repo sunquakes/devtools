@@ -4,16 +4,16 @@
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
          IgnorableNamespaces="uap rescap">
 
-  <Identity Name="$PACKAGE_NAME$"
-            Publisher="$PUBLISHER_ID$"
-            Version="$VERSION$"
-            ProcessorArchitecture="$ARCHITECTURE$" />
+  <Identity Name="DevTools"
+            Publisher="CN=Sunquakes"
+            Version="1.0.0.0"
+            ProcessorArchitecture="neutral" />
 
   <Properties>
-    <DisplayName>$DISPLAY_NAME$</DisplayName>
+    <DisplayName>DevTools Pro</DisplayName>
     <PublisherDisplayName>Sunquakes</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
-    <Description>Developer Tools Collection</Description>
+    <Description>A collection of developer tools for everyday tasks</Description>
   </Properties>
 
   <Dependencies>
@@ -29,8 +29,8 @@
     <Application Id="App"
                  Executable="DevTools.exe"
                  EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements DisplayName="$DISPLAY_NAME$"
-                          Description="Developer Tools Collection"
+      <uap:VisualElements DisplayName="DevTools Pro"
+                          Description="A collection of developer tools for everyday tasks"
                           BackgroundColor="transparent"
                           Square150x150Logo="Images\Square150x150Logo.png"
                           Square44x44Logo="Images\Square44x44Logo.png">
