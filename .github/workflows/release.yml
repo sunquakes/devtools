@@ -121,8 +121,6 @@ jobs:
           choco install innosetup -y
         shell: pwsh
 
-
-
       - name: Build Installers
         run: |
           New-Item -ItemType Directory -Force -Path installer
