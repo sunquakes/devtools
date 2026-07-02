@@ -194,7 +194,7 @@ jobs:
       - name: Restore
         run: dotnet restore DevTools.csproj
 
-      - name: Update Package.appxmanifest
+      - name: Prepare Package.appxmanifest build copy
         shell: pwsh
         env:
           VERSION: ${{ needs.extract-version.outputs.version }}
@@ -202,14 +202,18 @@ jobs:
           DISPLAY_NAME: ${{ env.DISPLAY_NAME }}
           PUBLISHER_ID: ${{ env.PUBLISHER_ID }}
         run: |
-          $manifestPath = "DevTools.Package\Package.appxmanifest"
-          $manifestContent = Get-Content $manifestPath -Raw
+          # Copy the original manifest to a build copy and replace placeholders there.
+          # The original Package.appxmanifest is never modified.
+          $srcPath = "DevTools.Package\Package.appxmanifest"
+          $buildPath = "DevTools.Package\Package.build.appxmanifest"
+          Copy-Item $srcPath $buildPath -Force
+          $manifestContent = [System.IO.File]::ReadAllText($buildPath)
           $manifestContent = $manifestContent -replace '\$PACKAGE_NAME\$', "${{ env.PACKAGE_NAME }}"
           $manifestContent = $manifestContent -replace '\$PUBLISHER_ID\$', "${{ env.PUBLISHER_ID }}"
           $manifestContent = $manifestContent -replace '\$DISPLAY_NAME\$', "${{ env.DISPLAY_NAME }}"
           $manifestContent = $manifestContent -replace 'Version="\$VERSION\$"', "Version=`"${{ env.VERSION }}.0`""
           $manifestContent = $manifestContent -replace '\$ARCHITECTURE\$', "x64"
-          Set-Content $manifestPath -Value $manifestContent -Encoding UTF8
+          [System.IO.File]::WriteAllText($buildPath, $manifestContent)
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -254,20 +258,29 @@ jobs:
 
       - name: Build MSIX x64
         run: |
-          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"' , 'ProcessorArchitecture="x64"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /p:AppxPackageDir=AppPackages\x64\ /t:Build /p:RestorePackages=true
+          $buildPath = "DevTools.Package\Package.build.appxmanifest"
+          $content = [System.IO.File]::ReadAllText($buildPath)
+          $content = $content -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x64"'
+          [System.IO.File]::WriteAllText($buildPath, $content)
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x64 /t:Build /p:RestorePackages=true /p:AppxManifestFile=Package.build.appxmanifest
         shell: pwsh
 
       - name: Build MSIX x86
         run: |
-          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"' , 'ProcessorArchitecture="x86"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /p:AppxPackageDir=AppPackages\x86\ /t:Build /p:RestorePackages=true
+          $buildPath = "DevTools.Package\Package.build.appxmanifest"
+          $content = [System.IO.File]::ReadAllText($buildPath)
+          $content = $content -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="x86"'
+          [System.IO.File]::WriteAllText($buildPath, $content)
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=x86 /t:Build /p:RestorePackages=true /p:AppxManifestFile=Package.build.appxmanifest
         shell: pwsh
 
       - name: Build MSIX arm64
         run: |
-          (Get-Content "DevTools.Package\Package.appxmanifest") -replace 'ProcessorArchitecture="[^"]*"' , 'ProcessorArchitecture="arm64"' | Set-Content "DevTools.Package\Package.appxmanifest"
-          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /p:AppxPackageDir=AppPackages\arm64\ /t:Build /p:RestorePackages=true
+          $buildPath = "DevTools.Package\Package.build.appxmanifest"
+          $content = [System.IO.File]::ReadAllText($buildPath)
+          $content = $content -replace 'ProcessorArchitecture="[^"]*"', 'ProcessorArchitecture="arm64"'
+          [System.IO.File]::WriteAllText($buildPath, $content)
+          msbuild DevTools.Package\DevTools.Package.wapproj /p:Configuration=Release /p:Platform=arm64 /t:Build /p:RestorePackages=true /p:AppxManifestFile=Package.build.appxmanifest
         shell: pwsh
 
       - name: Create MSIX bundle
@@ -276,31 +289,50 @@ jobs:
           $version = "${{ needs.extract-version.outputs.version }}"
           $makeappx = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\makeappx.exe" | Sort-Object { $_.VersionInfo.FileVersion } -Descending | Select-Object -First 1
 
-          $msixFiles = @(
-            "AppPackages\x64\DevTools.Package_${version}.0_x64.msix",
-            "AppPackages\x86\DevTools.Package_${version}.0_x86.msix",
-            "AppPackages\arm64\DevTools.Package_${version}.0_arm64.msix"
-          )
+          # MSIX files are generated in *_Test subdirectories under AppPackages
+          # Search both possible locations: repo root and DevTools.Package
+          $searchPaths = @("AppPackages", "DevTools.Package\AppPackages")
+          $allMsixFiles = @()
+          foreach ($searchPath in $searchPaths) {
+            if (Test-Path $searchPath) {
+              $files = Get-ChildItem -Path $searchPath -Recurse -Filter "*.msix" -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -notmatch "_Debug\.msix$" }
+              $allMsixFiles += $files
+            }
+          }
 
+          # Select one MSIX file per architecture (x64, x86, arm64)
           $existingFiles = @()
-          foreach ($f in $msixFiles) {
-            if (Test-Path $f) {
-              $existingFiles += $f
-              Write-Host "Found: $f"
+          foreach ($arch in @("x64", "x86", "arm64")) {
+            $archFile = $allMsixFiles | Where-Object { $_.Name -match "_${arch}\.msix$" } | Select-Object -First 1
+            if ($archFile) {
+              $existingFiles += $archFile.FullName
+              Write-Host "Found ${arch}: $($archFile.FullName)"
             } else {
-              Write-Host "Missing: $f"
+              Write-Host "Missing ${arch} MSIX file"
             }
           }
 
           if ($existingFiles.Count -eq 0) {
             Write-Host "No MSIX files found, listing all files..."
-            Get-ChildItem AppPackages -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+            foreach ($searchPath in $searchPaths) {
+              if (Test-Path $searchPath) {
+                Get-ChildItem $searchPath -Recurse | ForEach-Object { Write-Host $_.FullName }
+              }
+            }
             exit 1
           }
 
           $bundlePath = "DevTools_${version}_bundle.msixbundle"
           $inputFile = "bundle_input.txt"
-          $existingFiles | Set-Content $inputFile
+          # makeappx bundle expects a mapping file with [Files] header and
+          # quoted "source" "destination" pairs (one per line).
+          $lines = @("[Files]")
+          foreach ($f in $existingFiles) {
+            $fileName = Split-Path $f -Leaf
+            $lines += "`"$f`" `"$fileName`""
+          }
+          [System.IO.File]::WriteAllLines($inputFile, $lines)
 
           Write-Host "Creating bundle: $bundlePath"
           & $makeappx.FullName bundle /f $inputFile /p $bundlePath /o
@@ -313,8 +345,11 @@ jobs:
       - name: Show output
         shell: pwsh
         run: |
-          Write-Host "=== AppPackages ==="
+          Write-Host "=== AppPackages (repo root) ==="
           Get-ChildItem AppPackages -Recurse -ErrorAction SilentlyContinue
+
+          Write-Host "=== AppPackages (DevTools.Package) ==="
+          Get-ChildItem DevTools.Package\AppPackages -Recurse -ErrorAction SilentlyContinue
 
           Write-Host "=== All MSIX files ==="
           Get-ChildItem . -Recurse -Filter *.msix -ErrorAction SilentlyContinue | Select-Object FullName

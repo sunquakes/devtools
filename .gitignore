@@ -142,6 +142,9 @@ node_modules/
 **/Add-AppDevPackage.resources/
 **/TelemetryDependencies/
 
+# MSIX build-only manifest copy (generated from Package.appxmanifest)
+Package.build.appxmanifest
+
 # If .vs was already committed, remove it from the repo with:
 # git rm -r --cached .vs && git commit -m "Remove .vs from repo"
 

@@ -72,8 +72,11 @@
     <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
     <AppxHashAlgorithm>SHA256</AppxHashAlgorithm>
   </PropertyGroup>
+  <PropertyGroup>
+    <AppxManifestFile Condition="'$(AppxManifestFile)' == ''">Package.appxmanifest</AppxManifestFile>
+  </PropertyGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest">
+    <AppxManifest Include="$(AppxManifestFile)">
       <SubType>Designer</SubType>
     </AppxManifest>
   </ItemGroup>
