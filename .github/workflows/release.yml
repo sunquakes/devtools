@@ -465,9 +465,9 @@ jobs:
             grant_type    = "client_credentials"
             client_id     = $clientId
             client_secret = $clientSecret
-            scope         = "https://manage.devcenter.microsoft.com/.default"
+            resource      = "https://manage.devcenter.microsoft.com"
           }
-          $tokenResponse = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token" -Method POST -Body $tokenBody
+          $tokenResponse = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$tenantId/oauth2/token" -Method POST -Body $tokenBody
           $accessToken = $tokenResponse.access_token
           Write-Host "Got access token"
 
