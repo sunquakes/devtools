@@ -411,44 +411,115 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   publish-to-store:
-    needs: [extract-version, build-msix]
+    needs: [extract-version, create-release]
     runs-on: windows-latest
     steps:
-      - name: Download MSIX package
-        uses: actions/download-artifact@v4
-        with:
-          name: msix-package-v${{ needs.extract-version.outputs.version }}
-          path: downloaded
-
-      - name: Find MSIX bundle
-        id: package
+      - name: Download MSIX bundle from Release
         shell: pwsh
+        env:
+          VERSION: ${{ needs.extract-version.outputs.version }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          $file = Get-ChildItem downloaded -Recurse | Where-Object { $_.Extension -eq '.msixbundle' } | Select-Object -First 1
-          if (-not $file) {
-            Write-Error "No .msixbundle found in downloaded folder"
-            Get-ChildItem downloaded -Recurse | ForEach-Object { Write-Host $_.FullName }
+          $version = $env:VERSION
+          $repo = $env:REPO
+          $url = "https://github.com/$repo/releases/download/v$version/DevTools_${version}_bundle.msixbundle"
+          $output = "DevTools_${version}_bundle.msixbundle"
+
+          Write-Host "Downloading: $url"
+          if ($env:GH_TOKEN) {
+            $headers = @{ Authorization = "token $env:GH_TOKEN" }
+            Invoke-WebRequest -Uri $url -OutFile $output -Headers $headers -UseBasicParsing
+          } else {
+            Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
+          }
+
+          if (Test-Path $output) {
+            $size = [math]::Round((Get-Item $output).Length / 1MB, 2)
+            Write-Host "Downloaded: $output ($size MB)"
+          } else {
+            Write-Error "Download failed!"
             exit 1
           }
-          Write-Host "Found bundle: $($file.FullName)"
-          "PACKAGE=$($file.FullName)" >> $env:GITHUB_OUTPUT
 
-      - name: Verify package
+      - name: Submit MSIX to Microsoft Store
         shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+          VERSION: ${{ needs.extract-version.outputs.version }}
         run: |
-          Write-Host "=== Downloaded files ==="
-          Get-ChildItem downloaded -Recurse | ForEach-Object {
-            Write-Host "$($_.FullName) - $([math]::Round($_.Length / 1MB, 2)) MB"
+          $tenantId = $env:TENANT_ID
+          $clientId = $env:CLIENT_ID
+          $clientSecret = $env:CLIENT_SECRET
+          $productId = $env:PRODUCT_ID
+          $version = $env:VERSION
+          $msixPath = "DevTools_${version}_bundle.msixbundle"
+
+          $apiBase = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$productId/submissions"
+
+          Write-Host "=== Getting access token ==="
+          $tokenBody = @{
+            grant_type    = "client_credentials"
+            client_id     = $clientId
+            client_secret = $clientSecret
+            scope         = "https://manage.devcenter.microsoft.com/.default"
+          }
+          $tokenResponse = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token" -Method POST -Body $tokenBody
+          $accessToken = $tokenResponse.access_token
+          Write-Host "Got access token"
+
+          $headers = @{
+            Authorization = "Bearer $accessToken"
+            "Content-Type" = "application/json"
           }
 
-      - name: Publish To Store
-        uses: microsoft/store-submission@v1
-        with:
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-          app-id: ${{ secrets.STORE_PRODUCT_ID }}
-          package-path: ${{ steps.package.outputs.PACKAGE }}
+          Write-Host "`n=== Creating new submission (clones last published) ==="
+          $createResponse = Invoke-RestMethod -Uri $apiBase -Headers $headers -Method POST
+          $submissionId = $createResponse.id
+          $uploadUrl = $createResponse.fileUploadUrl
+          Write-Host "Submission ID: $submissionId"
+          Write-Host "Upload URL obtained"
+
+          Write-Host "`n=== Updating submission with new package reference ==="
+          $submissionData = $createResponse
+          $fileName = Split-Path $msixPath -Leaf
+          if ($submissionData.psobject.properties.match('packages').Count -gt 0 -and $submissionData.packages) {
+            $submissionData.packages[0].fileName = $fileName
+            $submissionData | ConvertTo-Json -Depth 10 | Out-File -FilePath "submission_update.json" -Encoding UTF8
+            $updateBody = Get-Content "submission_update.json" -Raw
+            Invoke-RestMethod -Uri "$apiBase/$submissionId" -Headers $headers -Method PUT -Body $updateBody
+            Write-Host "Submission data updated"
+          } else {
+            Write-Host "No packages field to update (using cloned data as-is)"
+          }
+
+          Write-Host "`n=== Packaging MSIX bundle into ZIP ==="
+          $zipPath = "submission.zip"
+          Compress-Archive -Path $msixPath -DestinationPath $zipPath
+          $zipSize = [math]::Round((Get-Item $zipPath).Length / 1MB, 2)
+          Write-Host "Created: $zipPath ($zipSize MB)"
+
+          Write-Host "`n=== Uploading ZIP to Azure Blob Storage ==="
+          $fileBytes = [System.IO.File]::ReadAllBytes($zipPath)
+          $blobHeaders = @{
+            "x-ms-blob-type" = "BlockBlob"
+            "Content-Type"   = "application/zip"
+          }
+          Invoke-RestMethod -Uri $uploadUrl -Method PUT -Body $fileBytes -Headers $blobHeaders
+          Write-Host "Upload completed"
+
+          Write-Host "`n=== Committing submission ==="
+          $commitResponse = Invoke-RestMethod -Uri "$apiBase/$submissionId/commit" -Headers $headers -Method POST
+          Write-Host "Submission committed"
+          Write-Host "Status: $($commitResponse.status)"
+
+          Write-Host "`n=== Submission successful ==="
+          Write-Host "Version: $version"
+          Write-Host "Product ID: $productId"
+          Write-Host "Submission ID: $submissionId"
 
       - name: Display result
         if: always()
