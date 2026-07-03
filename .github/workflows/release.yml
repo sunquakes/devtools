@@ -442,84 +442,25 @@ jobs:
             exit 1
           }
 
-      - name: Submit MSIX to Microsoft Store
+      - name: Configure Microsoft Store CLI
+        uses: microsoft/microsoft-store-apppublisher@v1.1
+
+      - name: Reconfigure store credentials
         shell: pwsh
-        env:
-          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
-          VERSION: ${{ needs.extract-version.outputs.version }}
         run: |
-          $tenantId = $env:TENANT_ID
-          $clientId = $env:CLIENT_ID
-          $clientSecret = $env:CLIENT_SECRET
-          $productId = $env:PRODUCT_ID
-          $version = $env:VERSION
-          $msixPath = "DevTools_${version}_bundle.msixbundle"
+          msstore reconfigure `
+            --tenantId ${{ secrets.AZURE_TENANT_ID }} `
+            --sellerId ${{ secrets.SELLER_ID }} `
+            --clientId ${{ secrets.AZURE_CLIENT_ID }} `
+            --clientSecret ${{ secrets.AZURE_CLIENT_SECRET }}
 
-          $apiBase = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$productId/submissions"
-
-          Write-Host "=== Getting access token ==="
-          $tokenBody = @{
-            grant_type    = "client_credentials"
-            client_id     = $clientId
-            client_secret = $clientSecret
-            resource      = "https://manage.devcenter.microsoft.com"
-          }
-          $tokenResponse = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$tenantId/oauth2/token" -Method POST -Body $tokenBody
-          $accessToken = $tokenResponse.access_token
-          Write-Host "Got access token"
-
-          $headers = @{
-            Authorization = "Bearer $accessToken"
-            "Content-Type" = "application/json"
-          }
-
-          Write-Host "`n=== Creating new submission (clones last published) ==="
-          $createResponse = Invoke-RestMethod -Uri $apiBase -Headers $headers -Method POST
-          $submissionId = $createResponse.id
-          $uploadUrl = $createResponse.fileUploadUrl
-          Write-Host "Submission ID: $submissionId"
-          Write-Host "Upload URL obtained"
-
-          Write-Host "`n=== Updating submission with new package reference ==="
-          $submissionData = $createResponse
-          $fileName = Split-Path $msixPath -Leaf
-          if ($submissionData.psobject.properties.match('packages').Count -gt 0 -and $submissionData.packages) {
-            $submissionData.packages[0].fileName = $fileName
-            $submissionData | ConvertTo-Json -Depth 10 | Out-File -FilePath "submission_update.json" -Encoding UTF8
-            $updateBody = Get-Content "submission_update.json" -Raw
-            Invoke-RestMethod -Uri "$apiBase/$submissionId" -Headers $headers -Method PUT -Body $updateBody
-            Write-Host "Submission data updated"
-          } else {
-            Write-Host "No packages field to update (using cloned data as-is)"
-          }
-
-          Write-Host "`n=== Packaging MSIX bundle into ZIP ==="
-          $zipPath = "submission.zip"
-          Compress-Archive -Path $msixPath -DestinationPath $zipPath
-          $zipSize = [math]::Round((Get-Item $zipPath).Length / 1MB, 2)
-          Write-Host "Created: $zipPath ($zipSize MB)"
-
-          Write-Host "`n=== Uploading ZIP to Azure Blob Storage ==="
-          $fileBytes = [System.IO.File]::ReadAllBytes($zipPath)
-          $blobHeaders = @{
-            "x-ms-blob-type" = "BlockBlob"
-            "Content-Type"   = "application/zip"
-          }
-          Invoke-RestMethod -Uri $uploadUrl -Method PUT -Body $fileBytes -Headers $blobHeaders
-          Write-Host "Upload completed"
-
-          Write-Host "`n=== Committing submission ==="
-          $commitResponse = Invoke-RestMethod -Uri "$apiBase/$submissionId/commit" -Headers $headers -Method POST
-          Write-Host "Submission committed"
-          Write-Host "Status: $($commitResponse.status)"
-
-          Write-Host "`n=== Submission successful ==="
-          Write-Host "Version: $version"
-          Write-Host "Product ID: $productId"
-          Write-Host "Submission ID: $submissionId"
+      - name: Publish MSIX bundle to Store
+        shell: pwsh
+        run: |
+          $version = "${{ needs.extract-version.outputs.version }}"
+          $bundlePath = "DevTools_${version}_bundle.msixbundle"
+          Write-Host "Publishing: $bundlePath"
+          msstore publish "$bundlePath" -id ${{ secrets.STORE_PRODUCT_ID }}
 
       - name: Display result
         if: always()

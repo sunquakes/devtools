@@ -55,6 +55,7 @@
             "command": "dotnet",
             "args": [
                 "build",
+                "DevTools.csproj", 
                 "--configuration",
                 "Release"
             ],
@@ -75,6 +76,7 @@
             "command": "dotnet",
             "args": [
                 "build",
+                "DevTools.csproj", 
                 "--configuration",
                 "Debug"
             ],
@@ -122,6 +124,7 @@
             "command": "dotnet",
             "args": [
                 "build",
+                "DevTools.csproj",
                 "--configuration",
                 "Release",
                 "--clean"
