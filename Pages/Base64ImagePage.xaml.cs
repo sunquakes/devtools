@@ -57,6 +57,10 @@ namespace DevTools.Pages
             {
                 InputText.Text = state.GetValueOrDefault("InputText", string.Empty);
             }
+            if (!string.IsNullOrWhiteSpace(InputText.Text))
+            {
+                Decode_Click(sender: null, e: null);
+            }
         }
 
         private void Decode_Click(object sender, RoutedEventArgs e)

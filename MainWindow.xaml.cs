@@ -130,7 +130,7 @@ namespace DevTools
             
             if (_apiServerEnabled)
             {
-                _notifyIcon.ShowBalloonTip(3000, "Toolbox", "API Server starting...", ToolTipIcon.Info);
+                _notifyIcon.ShowBalloonTip(1000, "Toolbox", "API Server starting...", ToolTipIcon.Info);
             }
         }
 
@@ -155,7 +155,7 @@ namespace DevTools
                 {
                     if (_notifyIcon != null)
                     {
-                        _notifyIcon.ShowBalloonTip(3000, "Toolbox", $"API Server started on port {port}", ToolTipIcon.Info);
+                        _notifyIcon.ShowBalloonTip(1000, "Toolbox", $"API Server started on port {port}", ToolTipIcon.Info);
                     }
                 }
                 else

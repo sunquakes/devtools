@@ -53,6 +53,10 @@ namespace DevTools.Pages
                 InputText.Text = state.GetValueOrDefault("InputText", string.Empty);
                 _lastFormattedJson = state.GetValueOrDefault("LastFormattedJson", string.Empty);
             }
+            if (!string.IsNullOrWhiteSpace(InputText.Text))
+            {
+                Format_Click(sender: null, e: null);
+            }
         }
 
         private async void Format_Click(object sender, RoutedEventArgs e)

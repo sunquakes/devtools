@@ -98,8 +98,11 @@ namespace DevTools.Pages
                     
                 // Restart to apply changes
                     var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-                    var startInfo = new System.Diagnostics.ProcessStartInfo(currentProcess.MainModule.FileName);
-                    System.Diagnostics.Process.Start(startInfo);
+                    if (currentProcess.MainModule != null)
+                    {
+                        var startInfo = new System.Diagnostics.ProcessStartInfo(currentProcess.MainModule.FileName);
+                        System.Diagnostics.Process.Start(startInfo);
+                    }
                     Application.Current.Shutdown();
                 }
             }

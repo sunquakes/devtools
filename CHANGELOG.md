@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.3.1] - 2026-07-06
+
+### Added
+- **Tab State Persistence** - Return to previously selected tab after navigating back from a tool
+- **Auto-Execute on Entry** - Automatically process content when entering pages
+  - Base64 to Image: auto-generates image if textbox contains content
+  - JSON Format: auto-formats if textbox contains content
+
+### Changed
+- **Notification Duration** - Reduced popup notification time from 3 seconds to 1 second
+
+### Fixed
+- **Compilation Warnings** - Resolved null reference warnings in multiple pages
+  - HomePage: nullable type annotations for TabItem variables
+  - Base64ImagePage/JsonFormatPage: named parameters for null arguments
+  - SettingsPage: null check for MainModule before accessing
+
+---
+
 ## [2.3.0] - 2026-06-25
 
 ### Added

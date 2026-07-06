@@ -158,8 +158,8 @@
                  IsUndoEnabled="True"
                  UndoLimit="20"/>
         
-        <TabControl Style="{StaticResource ModernTabControl}" 
-                    Margin="20,60,20,20">
+        <TabControl x:Name="MainTabControl" Style="{StaticResource ModernTabControl}" 
+                    Margin="20,60,20,20" SelectionChanged="MainTabControl_SelectionChanged">
             
             <!-- 编码工具 -->
             <TabItem Header="{x:Static resources:Strings.CategoryEncoding}" Tag="&#xf121;" Style="{StaticResource ModernTabItem}">

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
+using DevTools.Helpers;
 
 namespace DevTools.Pages
 {
@@ -19,13 +20,36 @@ namespace DevTools.Pages
             // Initialize search debounce timer
             _searchTimer = new System.Windows.Threading.DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(300) // 300ms delay
+                Interval = TimeSpan.FromMilliseconds(300)
             };
             _searchTimer.Tick += (s, e) =>
             {
                 _searchTimer.Stop();
                 FilterTools(SearchBox.Text);
             };
+
+            LoadTabState();
+        }
+
+        private void LoadTabState()
+        {
+            var state = PageStateManager.GetPageState(this);
+            if (state != null && state.TryGetValue("SelectedTabIndex", out var indexStr) && int.TryParse(indexStr, out var index))
+            {
+                if (index >= 0 && index < MainTabControl.Items.Count)
+                {
+                    MainTabControl.SelectedIndex = index;
+                }
+            }
+        }
+
+        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var state = new Dictionary<string, string>
+            {
+                { "SelectedTabIndex", MainTabControl.SelectedIndex.ToString() }
+            };
+            PageStateManager.SavePageState(this, state);
         }
 
         private void BtnMd5_Click(object sender, RoutedEventArgs e)
@@ -121,7 +145,7 @@ namespace DevTools.Pages
             
             // Get TabControl and current selected tab first
             var tabControl = FindVisualChildren<System.Windows.Controls.TabControl>(this).FirstOrDefault();
-            TabItem currentSelectedTab = tabControl?.SelectedItem as TabItem;
+            var currentSelectedTab = tabControl?.SelectedItem as TabItem;
             
             // Filter buttons in all tabs
             var allButtons = FindVisualChildren<System.Windows.Controls.Button>(this);
@@ -142,8 +166,8 @@ namespace DevTools.Pages
             }
             
             // Filter tabs and find first visible tab
-            var allTabs = FindVisualChildren<TabItem>(this);
-            TabItem firstVisibleTab = null;
+            var allTabs = FindVisualChildren<TabItem>(this).ToList();
+            TabItem? firstVisibleTab = null;
             
             foreach (var tab in allTabs)
             {
