@@ -397,9 +397,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            installer/DevTools-win-x86.exe
-            installer/DevTools-win-x64.exe
-            installer/DevTools-win-arm64.exe
             installer/*.exe
             msix/*.msixbundle
         env:
