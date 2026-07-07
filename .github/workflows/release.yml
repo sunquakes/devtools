@@ -160,16 +160,24 @@ jobs:
           Rename-Item -Path publish\win-x64\DevTools.exe -NewName DevTools-win-x64.exe
           Rename-Item -Path publish\win-arm64\DevTools.exe -NewName DevTools-win-arm64.exe
 
+      - name: Prepare release artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release-artifacts
+          Copy-Item publish\win-x86\DevTools-win-x86.exe release-artifacts\ -Force
+          Copy-Item publish\win-x64\DevTools-win-x64.exe release-artifacts\ -Force
+          Copy-Item publish\win-arm64\DevTools-win-arm64.exe release-artifacts\ -Force
+          Copy-Item installer\*.exe release-artifacts\ -Force
+          Write-Host "Release artifacts:"
+          Get-ChildItem release-artifacts\
+
       - name: Upload installer artifacts
         uses: actions/upload-artifact@v4
         with:
           name: installer-v${{ needs.extract-version.outputs.version }}
-          path: |
-            publish/win-x86/DevTools-win-x86.exe
-            publish/win-x64/DevTools-win-x64.exe
-            publish/win-arm64/DevTools-win-arm64.exe
-            installer/*.exe
+          path: release-artifacts/
           retention-days: 30
+          if-no-files-found: error
 
   build-msix:
     needs: extract-version
@@ -396,6 +404,15 @@ jobs:
             msix/*.msixbundle
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Verify release files
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "=== Installer files ==="
+          Get-ChildItem installer\ -ErrorAction SilentlyContinue | Select-Object Name, Length
+          Write-Host "`n=== MSIX files ==="
+          Get-ChildItem msix\ -ErrorAction SilentlyContinue | Select-Object Name, Length
 
   publish-to-store:
     needs: [extract-version, create-release]
