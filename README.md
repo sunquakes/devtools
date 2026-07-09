@@ -100,6 +100,10 @@ Download the latest release for your platform:
 | Windows | x86 (32-bit) | `DevTools-win-x86.exe` |
 | Windows | ARM64 | `DevTools-win-arm64.exe` |
 
+### Microsoft Store
+
+[![Get it from Microsoft](Resources/Images/microsoft-store-badge-en.png)](https://apps.microsoft.com/detail/9NDCPCR84L20)
+
 ## Usage
 
 1. Download the executable for your platform

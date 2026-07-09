@@ -41,6 +41,10 @@
 | Windows | x86 (32位) | `DevTools-win-x86.exe` |
 | Windows | ARM64 | `DevTools-win-arm64.exe` |
 
+### 微软应用商店
+
+[![从 Microsoft 获取](Resources/Images/microsoft-store-badge-zh.png)](https://apps.microsoft.com/detail/9NDCPCR84L20?hl=zh-cn&gl=CN)
+
 ## 使用
 
 1. 下载对应平台的可执行文件
