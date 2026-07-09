@@ -102,7 +102,7 @@ Download the latest release for your platform:
 
 ### Microsoft Store
 
-[![Get it from Microsoft](Resources/Images/microsoft-store-badge-en.png)](https://apps.microsoft.com/detail/9NDCPCR84L20)
+[<img src="Resources/Images/microsoft-store-badge-en.png" alt="Get it from Microsoft" width="200">](https://apps.microsoft.com/detail/9NDCPCR84L20)
 
 ## Usage
 

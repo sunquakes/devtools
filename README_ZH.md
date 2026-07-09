@@ -43,7 +43,7 @@
 
 ### 微软应用商店
 
-[![从 Microsoft 获取](Resources/Images/microsoft-store-badge-zh.png)](https://apps.microsoft.com/detail/9NDCPCR84L20?hl=zh-cn&gl=CN)
+[<img src="Resources/Images/microsoft-store-badge-zh.png" alt="从 Microsoft 获取" width="200">](https://apps.microsoft.com/detail/9NDCPCR84L20?hl=zh-cn&gl=CN)
 
 ## 使用
 
