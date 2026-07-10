@@ -487,4 +487,28 @@
   <data name="CategoryQuery" xml:space="preserve">
     <value>Query Tools</value>
   </data>
+  <data name="PageTimestamp" xml:space="preserve">
+    <value>Timestamp</value>
+  </data>
+  <data name="Timestamp" xml:space="preserve">
+    <value>Timestamp</value>
+  </data>
+  <data name="CurrentTimestamp" xml:space="preserve">
+    <value>Current Timestamp</value>
+  </data>
+  <data name="UnixTimestamp" xml:space="preserve">
+    <value>Unix Timestamp</value>
+  </data>
+  <data name="DateTime" xml:space="preserve">
+    <value>Date Time</value>
+  </data>
+  <data name="Milliseconds" xml:space="preserve">
+    <value>Milliseconds</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>Seconds</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
 </root>

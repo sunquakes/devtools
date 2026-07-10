@@ -451,4 +451,25 @@
   <data name="AddressName" xml:space="preserve">
     <value>地址名称</value>
   </data>
+  <data name="PageTimestamp" xml:space="preserve">
+    <value>时间戳</value>
+  </data>
+  <data name="Timestamp" xml:space="preserve">
+    <value>时间戳</value>
+  </data>
+  <data name="CurrentTimestamp" xml:space="preserve">
+    <value>当前时间戳</value>
+  </data>
+  <data name="UnixTimestamp" xml:space="preserve">
+    <value>Unix时间戳</value>
+  </data>
+  <data name="DateTime" xml:space="preserve">
+    <value>日期时间</value>
+  </data>
+  <data name="Milliseconds" xml:space="preserve">
+    <value>毫秒</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>秒</value>
+  </data>
 </root>

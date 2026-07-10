@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,7 +18,6 @@ namespace DevTools.Pages
         {
             InitializeComponent();
             
-            // Initialize search debounce timer
             _searchTimer = new System.Windows.Threading.DispatcherTimer
             {
                 Interval = TimeSpan.FromMilliseconds(300)
@@ -105,6 +105,11 @@ namespace DevTools.Pages
         private void BtnRandomString_Click(object sender, RoutedEventArgs e)
         {
             NavigationService?.Navigate(new RandomStringPage());
+        }
+
+        private void BtnTimestamp_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new TimestampPage());
         }
 
         private void BtnDistrictCode_Click(object sender, RoutedEventArgs e)
