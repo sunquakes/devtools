@@ -155,6 +155,14 @@ namespace DevTools.Resources
         public static string SearchAddressOrCode => Get("SearchAddressOrCode");
         public static string SearchResults => Get("SearchResults");
         public static string AddressName => Get("AddressName");
+        public static string PageTimestamp => Get("PageTimestamp");
+        public static string Timestamp => Get("Timestamp");
+        public static string CurrentTimestamp => Get("CurrentTimestamp");
+        public static string UnixTimestamp => Get("UnixTimestamp");
+        public static string DateTime => Get("DateTime");
+        public static string Milliseconds => Get("Milliseconds");
+        public static string Seconds => Get("Seconds");
+        public static string Refresh => Get("Refresh");
         public static string CategoryEncoding => Get("CategoryEncoding");
         public static string CategoryImage => Get("CategoryImage");
         public static string CategoryData => Get("CategoryData");

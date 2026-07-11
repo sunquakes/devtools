@@ -137,6 +137,9 @@ node_modules/
 *.appxsym
 *.msixsym
 
+# Debug server output
+.dbg/
+
 # MSIX generated install scripts and resources
 **/Add-AppDevPackage.ps1
 **/Add-AppDevPackage.resources/

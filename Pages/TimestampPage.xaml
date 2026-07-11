@@ -1,0 +1,113 @@
+<Page x:Class="DevTools.Pages.TimestampPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:resources="clr-namespace:DevTools.Resources"
+      Title="TimestampPage">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Button Click="Back_Click" Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,12" Width="40" Height="40" ToolTip="{x:Static resources:Strings.Back}">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="#4A4A4A" CornerRadius="20" Width="40" Height="40" SnapsToDevicePixels="True">
+                        <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf060;" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFFFF" />
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+
+        <TextBlock Grid.Row="0" Text="{x:Static resources:Strings.PageTimestamp}" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,8" />
+
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border CornerRadius="8" BorderBrush="#4A4A4A" BorderThickness="2" Margin="0,10" Padding="20" Width="450">
+                <StackPanel>
+                    <TextBlock Text="{x:Static resources:Strings.CurrentTimestamp}" FontWeight="Bold" Margin="0,0,0,12" />
+
+                    <StackPanel Orientation="Vertical" Margin="0,6">
+                        <TextBlock Text="{x:Static resources:Strings.Milliseconds}" FontSize="12" />
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="OutMs" IsReadOnly="True" Grid.Column="0" />
+                            <Button Click="CopyMs_Click" Grid.Column="1" Margin="8,0,0,0" Width="60" Height="32" ToolTip="{x:Static resources:Strings.Copy}">
+                                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,6">
+                        <TextBlock Text="{x:Static resources:Strings.Seconds}" FontSize="12" />
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="OutSec" IsReadOnly="True" Grid.Column="0" />
+                            <Button Click="CopySec_Click" Grid.Column="1" Margin="8,0,0,0" Width="60" Height="32" ToolTip="{x:Static resources:Strings.Copy}">
+                                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,6">
+                        <TextBlock Text="{x:Static resources:Strings.DateTime}" FontSize="12" />
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="OutDateTime" IsReadOnly="True" Grid.Column="0" />
+                            <Button Click="CopyDateTime_Click" Grid.Column="1" Margin="8,0,0,0" Width="60" Height="32" ToolTip="{x:Static resources:Strings.Copy}">
+                                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Button Click="Refresh_Click" Width="120" Height="32" Margin="0,15" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf021;" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,6,0" />
+                    <TextBlock Text="{x:Static resources:Strings.Refresh}" FontSize="14" Foreground="#FFFFFF" />
+                </StackPanel>
+            </Button>
+
+            <Border CornerRadius="8" BorderBrush="#4A4A4A" BorderThickness="2" Margin="0,10" Padding="20" Width="450">
+                <StackPanel>
+                    <TextBlock Text="{x:Static resources:Strings.UnixTimestamp}" FontWeight="Bold" Margin="0,0,0,12" />
+
+                    <StackPanel Orientation="Vertical" Margin="0,6">
+                        <TextBlock Text="{x:Static resources:Strings.UnixTimestamp}" FontSize="12" />
+                        <TextBox x:Name="InputTimestamp" Margin="0,4" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="0,6">
+                        <TextBlock Text="{x:Static resources:Strings.DateTime}" FontSize="12" />
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="OutConvertDateTime" IsReadOnly="True" Grid.Column="0" />
+                            <Button Click="CopyConvertDateTime_Click" Grid.Column="1" Margin="8,0,0,0" Width="60" Height="32" ToolTip="{x:Static resources:Strings.Copy}">
+                                <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf0c5;" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+
+                    <Button Click="Convert_Click" Width="120" Height="32" Margin="0,10" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="{StaticResource FontAwesomeSolid}" Text="&#xf362;" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,6,0" />
+                            <TextBlock Text="{x:Static resources:Strings.Convert}" FontSize="14" Foreground="#FFFFFF" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Page>
