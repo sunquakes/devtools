@@ -176,7 +176,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
-MIT License
+Apache License 2.0
 
 ---
 
