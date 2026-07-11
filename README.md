@@ -170,19 +170,13 @@ The application supports multiple languages:
 - English (en-US)
 - 简体中文 (zh-CN)
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
 ## License
 
 MIT License
-
-## Version
-
-**Current Version:** 2.2.0
-
-### What's New in 2.2.0
-- 🔍 **QR/Barcode Decode** - Decode QR codes and barcodes from images with drag-and-drop and paste support
-- 🎲 **Random String Generator** - Generate random strings with configurable character sets
-- 📐 **Home Page Layout** - Updated to 4 cards per row for better screen utilization
-- 🎨 **Improved Icons** - Updated icons for better visual clarity
 
 ---
 

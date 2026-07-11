@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="#功能">功能</a> •
+  <a href="#api">API</a> •
   <a href="#安装">安装</a> •
   <a href="#使用">使用</a> •
   <a href="#开发">开发</a> •
@@ -30,6 +31,64 @@
 - **二维码/条形码识别** - 从图片中识别和解析二维码、条形码
 - **随机字符串生成** - 生成可配置选项的随机字符串
 - **手写签名** - 绘制签名并转换为 Base64 或保存为图片
+- **RESTful API** - 所有工具可通过 HTTP API 访问，支持 AI 代理集成
+
+## RESTful API
+
+DevTools 现在提供 RESTful API 服务器，将所有工具功能暴露为 HTTP 端点。这允许 AI 代理和其他应用程序以编程方式访问所有功能。
+
+### 快速开始
+
+1. 在 `App.config` 中启用 API 服务器：
+```xml
+<appSettings>
+    <add key="EnableApiServer" value="true"/>
+    <add key="ApiServerPort" value="5000"/>
+</appSettings>
+```
+
+2. 运行 DevTools 应用程序 - API 服务器会自动启动
+
+3. 调用 API 端点：
+```bash
+# 健康检查
+curl http://localhost:5000/api/health
+
+# MD5 哈希
+curl -X POST http://localhost:5000/api/md5 \
+  -H "Content-Type: application/json" \
+  -d '{"input":"hello world"}'
+
+# 生成二维码
+curl -X POST http://localhost:5000/api/qrcode \
+  -H "Content-Type: application/json" \
+  -d '{"text":"https://example.com","width":300,"height":300}'
+```
+
+### 可用的 API 端点
+
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/api/health` | GET | 健康检查 |
+| `/api/md5` | POST | MD5 哈希计算 |
+| `/api/json/format` | POST | JSON 格式化 |
+| `/api/json/validate` | POST | JSON 验证 |
+| `/api/url/encode` | POST | URL 编码 |
+| `/api/url/decode` | POST | URL 解码 |
+| `/api/escape` | POST | 字符串转义 |
+| `/api/unescape` | POST | 字符串反转义 |
+| `/api/base64/encode` | POST | Base64 编码 |
+| `/api/base64/decode` | POST | Base64 解码 |
+| `/api/qrcode` | POST | 生成二维码 |
+| `/api/barcode` | POST | 生成条形码 |
+| `/api/barcode/formats` | GET | 获取支持的条形码格式 |
+
+### API 文档
+
+完整的 API 文档，请查看：
+- **[API/README.md](API/README.md)** - 完整 API 文档
+- **[API/EXAMPLES.md](API/EXAMPLES.md)** - 使用示例（Python、JavaScript、cURL、PowerShell）
+- **[API/QUICK_REFERENCE.md](API/QUICK_REFERENCE.md)** - 快速参考指南
 
 ## 安装
 
@@ -50,6 +109,7 @@
 1. 下载对应平台的可执行文件
 2. 直接运行 `DevTools.exe`（无需安装）
 3. 在首页选择需要的工具
+4. （可选）在 `App.config` 中启用 API 服务器以支持编程访问
 
 ## 开发
 
@@ -78,6 +138,11 @@ dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=
 
 ```
 DevTools/
+├── API/                # RESTful API 实现
+│   ├── Models/         # API 数据模型
+│   ├── Services/       # API 服务实现
+│   ├── Server/         # HTTP 服务器
+│   └── Documentation/  # API 文档
 ├── Pages/              # 应用页面
 │   ├── HomePage.xaml
 │   ├── Md5Page.xaml
@@ -107,20 +172,14 @@ DevTools/
 
 界面语言自动匹配系统语言。
 
-## 许可证
-
-Apache License 2.0
-
-## 版本
-
-**当前版本：** 2.2.0
-
-### 2.2.0 新功能
-- 🔍 **二维码/条形码识别** - 支持拖拽、粘贴图片，滚动预览，一键复制识别结果
-- 🎲 **随机字符串生成** - 支持自定义数量、长度、字符集选项
-- 📐 **首页布局优化** - 改为每行 4 个卡片，提升屏幕利用率
-- 🎨 **图标优化** - 更新首页图标，更贴合功能
-
 ## 更新日志
 
 查看 [CHANGELOG.md](CHANGELOG.md) 了解版本历史。
+
+## 许可证
+
+MIT License
+
+---
+
+**DevTools** - 您必备的开发伴侣，现已支持 RESTful API！
