@@ -174,7 +174,9 @@ DevTools/
 
 ## 更新日志
 
-查看 [CHANGELOG.md](CHANGELOG.md) 了解版本历史。
+**当前版本：** 2.4.0
+
+查看 [CHANGELOG.md](CHANGELOG.md) 了解完整版本历史。
 
 ## 许可证
 

@@ -44,13 +44,46 @@ When adding or modifying any text, the following files must be updated synchrono
 
 ---
 
-## 2. Button Icon Standards
+## 2. README i18n Synchronization Standards
 
-### 2.1 Icon Library
+### 2.1 Scope
+When modifying or updating README files, **both English and Chinese versions must be updated synchronously**:
+- `README.md` (English)
+- `README_ZH.md` (Simplified Chinese)
+
+### 2.2 Synchronization Requirements
+The following content must be kept consistent across both versions:
+- Project title and description
+- Feature list (translated appropriately)
+- RESTful API documentation
+- Installation instructions
+- Usage steps
+- Development documentation
+- Project structure
+- Localization information
+- Changelog/version information
+- License
+- Footer slogan
+
+### 2.3 Synchronization Process
+1. Update `README.md` first with English content
+2. Translate the changes and update `README_ZH.md` immediately
+3. Verify both files have the same structure and sections
+4. Ensure cross-language links work correctly (`README.md` ↔ `README_ZH.md`)
+
+### 2.4 Exceptions
+- Language-specific content (e.g., language names in localization section) may differ
+- Microsoft Store badge links may include language parameters (`?hl=zh-cn&gl=CN`)
+
+---
+
+## 3. Button Icon Standards
+
+### 3.1 Icon Library
 - Use FontAwesome Solid font icons
 - FontFamily: `{StaticResource FontAwesomeSolid}`
 
-### 2.2 Back Button Style (Circle)
+### 3.2 Back Button Style (Circle)
 ```xml
 <Button Click="Back_Click" Width="40" Height="40" ToolTip="{x:Static resources:Strings.Back}">
     <Button.Template>
@@ -69,7 +102,7 @@ When adding or modifying any text, the following files must be updated synchrono
 </Button>
 ```
 
-### 2.3 Action Button Style (Rectangle)
+### 3.3 Action Button Style (Rectangle)
 ```xml
 <Button Click="CopyResult_Click" Width="100" Height="32">
     <StackPanel Orientation="Horizontal">
@@ -86,7 +119,7 @@ When adding or modifying any text, the following files must be updated synchrono
 </Button>
 ```
 
-### 2.4 Common Icon Codes
+### 3.4 Common Icon Codes
 | Icon | Code | Usage |
 |------|------|------|
 | Back | `&#xf060;` | Navigate back |
@@ -101,9 +134,9 @@ When adding or modifying any text, the following files must be updated synchrono
 
 ---
 
-## 3. Home Page Tab Category Standards
+## 4. Home Page Tab Category Standards
 
-### 3.1 Tab Control Structure
+### 4.1 Tab Control Structure
 The home page uses `TabControl` to organize tool categories. Each category is a `TabItem`:
 
 ```xml
@@ -120,17 +153,17 @@ The home page uses `TabControl` to organize tool categories. Each category is a 
 </TabControl>
 ```
 
-### 3.2 Tab Item Style
+### 4.2 Tab Item Style
 - Tab text must use `Header="{x:Static resources:Strings.CategoryXXX}"` (i18n)
 - Tab icon uses the FontAwesome icon code in the `Tag` attribute
 - Default state: gray text
 - Selected state: white background + blue icon + dark text
 
-### 3.3 Category Naming Convention
+### 4.3 Category Naming Convention
 - Category name: `CategoryXXX` (e.g., `CategoryEncoding`, `CategoryImage`, `CategoryData`, `CategoryQuery`)
 - Must add corresponding entries in `Strings.resx`, `Strings.zh-CN.resx`, and `Strings.en-US.resx`
 
-### 3.4 Tool Button Style
+### 4.4 Tool Button Style
 ```xml
 <Button x:Name="BtnXXX" Click="BtnXXX_Click" Style="{StaticResource ToolButtonStyle}">
     <StackPanel Width="140" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -152,13 +185,13 @@ The home page uses `TabControl` to organize tool categories. Each category is a 
 </Button>
 ```
 
-### 3.5 Adding a New Tool Category
+### 4.5 Adding a New Tool Category
 1. Add `CategoryXXX` resource string to `Strings.resx` (English)
 2. Add `CategoryXXX` resource string to `Strings.zh-CN.resx` (Chinese)
 3. Add a new `TabItem` in `HomePage.xaml` with `Header` bound to the resource
 4. Add tool buttons inside the `TabItem`
 
-### 3.6 Adding a New Tool
+### 4.6 Adding a New Tool
 1. Create page files: `Pages/XXXPage.xaml` and `Pages/XXXPage.xaml.cs`
 2. Add resource strings to `Strings.resx`, `Strings.zh-CN.resx`, and `Strings.en-US.resx`
 3. Add tool button to the corresponding `TabItem` in `HomePage.xaml`
@@ -166,9 +199,9 @@ The home page uses `TabControl` to organize tool categories. Each category is a 
 
 ---
 
-## 4. Page Structure Template
+## 5. Page Structure Template
 
-### 4.1 Basic Layout
+### 5.1 Basic Layout
 ```xml
 <Page x:Class="DevTools.Pages.XXXPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -246,26 +279,75 @@ namespace DevTools.Pages
 
 ---
 
-## 5. Code Review Checklist
+## 5. CHANGELOG Standards
 
-### 5.1 i18n Check
+### 5.1 Format
+All notable changes must be documented in `CHANGELOG.md`. Follow the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format:
+
+```markdown
+## [version] - YYYY-MM-DD
+
+### Added
+- **Feature Name** - Description of the new feature
+  - Sub-item details
+
+### Changed
+- **Change Name** - Description of the change
+  - Sub-item details
+
+### Fixed
+- **Bug Name** - Description of the bug fix
+  - Sub-item details
+
+---
+```
+
+### 5.2 Version Numbering
+- Use semantic versioning: `MAJOR.MINOR.PATCH`
+- `MAJOR`: Breaking changes
+- `MINOR`: New features
+- `PATCH`: Bug fixes
+
+### 5.3 Section Types
+- **Added**: New features, new pages, new APIs
+- **Changed**: Modified existing functionality, UI changes, documentation updates
+- **Fixed**: Bug fixes, error corrections, security fixes
+
+### 5.4 Entry Guidelines
+- Start each entry with a bold feature/change/bug name
+- Use past tense (e.g., "Added", "Changed", "Fixed")
+- Include sub-items for detailed changes
+- Use backticks for code references (e.g., `net8.0-windows`)
+- Keep descriptions concise but informative
+- Use `---` as separator between versions
+
+### 5.5 Synchronization
+- When updating CHANGELOG.md, also update the version number in both README files:
+  - `README.md`: **Current Version:** X.Y.Z
+  - `README_ZH.md`: **当前版本：** X.Y.Z
+
+---
+
+## 6. Code Review Checklist
+
+### 6.1 i18n Check
 - [ ] All UI text uses resource files, no hard-coded strings (including tab headers, category titles, placeholders, MessageBox, etc.)
 - [ ] `Strings.resx` (default), `Strings.zh-CN.resx`, and `Strings.en-US.resx` updated synchronously
 - [ ] New categories use `CategoryXXX` naming convention
 
-### 5.2 UI Standards Check
+### 6.2 UI Standards Check
 - [ ] Buttons use FontAwesome icons with white foreground color (#FFFFFF)
 - [ ] Back button uses the circle template (40x40)
 - [ ] Action button uses the rectangle template (with icon + text)
 - [ ] Pages follow the unified layout template
 - [ ] Tab headers use `Header="{x:Static resources:Strings.XXX}"` to bind resources
 
-### 5.3 Architecture Check
+### 6.3 Architecture Check
 - [ ] Home page navigation updated when adding new features (added in the correct `TabItem`)
 - [ ] Use `PageStateManager` for page state management
 - [ ] Button click events navigate to correct pages
 - [ ] No duplicate or dead code
 
-### 5.4 Build Check
+### 6.4 Build Check
 - [ ] Project compiles with zero errors
 - [ ] No new compiler warnings introduced

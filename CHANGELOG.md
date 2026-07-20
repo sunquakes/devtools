@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.4.0] - 2026-07-20
+
+### Added
+- **Microsoft Store Badge** - Added official Microsoft Store download badges in README files
+  - English badge: "Get it from Microsoft"
+  - Chinese badge: "从 Microsoft 获取"
+  - Configurable width (200px) for optimal display
+- **CHANGELOG.md Reference** - Added changelog link to both English and Chinese README files
+- **README i18n Synchronization** - Established synchronization rule in AGENTS.md for maintaining consistent content across language versions
+
+### Changed
+- **Windows 10 Compatibility** - Improved compatibility for Windows 10 users
+  - Changed TargetFramework from `net8.0-windows10.0.26100.0` to `net8.0-windows`
+  - Updated TargetPlatformMinVersion to `10.0.17763.0` (Windows 10 1809)
+  - Removed Windows App SDK self-contained mode for broader compatibility
+  - Added full supportedOS declarations in app.manifest
+- **README Documentation** - Unified English and Chinese README files
+  - Added RESTful API section to Chinese README
+  - Added changelog section to English README
+  - Updated navigation links with API reference
+  - Standardized license to Apache License 2.0
+  - Aligned project structure documentation
+  - Added consistent footer slogan
+
+### Fixed
+- **License Inconsistency** - Corrected README license from MIT License to Apache License 2.0 (matching LICENSE file)
+
+---
+
 ## [2.3.1] - 2026-07-06
 
 ### Added

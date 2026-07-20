@@ -172,7 +172,9 @@ The application supports multiple languages:
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for version history.
+**Current Version:** 2.4.0
+
+See [CHANGELOG.md](CHANGELOG.md) for complete version history.
 
 ## License
 
