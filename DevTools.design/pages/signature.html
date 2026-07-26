@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手写签名</title>
+    <style id="theme-vars">
+/* DevTools Redesign — Minimal Flat Light */
+:root {
+  /* Neutral palette */
+  --dt-background: #F8F9FC;
+  --dt-foreground: #1D1D1F;
+  --dt-card: #FFFFFF;
+  --dt-card-foreground: #1D1D1F;
+  --dt-popover: #FFFFFF;
+  --dt-popover-foreground: #1D1D1F;
+  --dt-muted: #F1F3F8;
+  --dt-muted-foreground: #86868B;
+  --dt-border: #E5E5EA;
+  --dt-input: #E8E8ED;
+  --dt-ring: #007AFF;
+
+  /* Primary */
+  --dt-primary: #007AFF;
+  --dt-primary-foreground: #FFFFFF;
+
+  /* Semantic states */
+  --dt-success: #34C759;
+  --dt-warning: #FF9500;
+  --dt-error: #FF3B30;
+  --dt-info: #007AFF;
+
+  /* Radius scale */
+  --dt-radius-sm: 8px;
+  --dt-radius-md: 12px;
+  --dt-radius-lg: 16px;
+  --dt-radius-xl: 20px;
+
+  /* Depth / shadow */
+  --dt-shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --dt-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --dt-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+  /* Typography */
+  --dt-font-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --dt-font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--dt-background);
+    --color-foreground: var(--dt-foreground);
+    --color-card: var(--dt-card);
+    --color-card-foreground: var(--dt-card-foreground);
+    --color-popover: var(--dt-popover);
+    --color-popover-foreground: var(--dt-popover-foreground);
+    --color-primary: var(--dt-primary);
+    --color-primary-foreground: var(--dt-primary-foreground);
+    --color-muted: var(--dt-muted);
+    --color-muted-foreground: var(--dt-muted-foreground);
+    --color-border: var(--dt-border);
+    --color-input: var(--dt-input);
+    --color-ring: var(--dt-ring);
+    --radius-sm: var(--dt-radius-sm);
+    --radius-md: var(--dt-radius-md);
+    --radius-lg: var(--dt-radius-lg);
+    --radius-xl: var(--dt-radius-xl);
+  }
+  @layer base {
+    body { background: var(--dt-background); color: var(--dt-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--dt-background); }
+      .text-background { color: var(--dt-background); }
+      .border-background { border-color: var(--dt-background); }
+      .ring-background { --tw-ring-color: var(--dt-background); }
+      .bg-foreground { background-color: var(--dt-foreground); }
+      .text-foreground { color: var(--dt-foreground); }
+      .border-foreground { border-color: var(--dt-foreground); }
+      .ring-foreground { --tw-ring-color: var(--dt-foreground); }
+      .bg-card { background-color: var(--dt-card); }
+      .text-card { color: var(--dt-card); }
+      .border-card { border-color: var(--dt-card); }
+      .ring-card { --tw-ring-color: var(--dt-card); }
+      .bg-card-foreground { background-color: var(--dt-card-foreground); }
+      .text-card-foreground { color: var(--dt-card-foreground); }
+      .border-card-foreground { border-color: var(--dt-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--dt-card-foreground); }
+      .bg-popover { background-color: var(--dt-popover); }
+      .text-popover { color: var(--dt-popover); }
+      .border-popover { border-color: var(--dt-popover); }
+      .ring-popover { --tw-ring-color: var(--dt-popover); }
+      .bg-popover-foreground { background-color: var(--dt-popover-foreground); }
+      .text-popover-foreground { color: var(--dt-popover-foreground); }
+      .border-popover-foreground { border-color: var(--dt-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--dt-popover-foreground); }
+      .bg-primary { background-color: var(--dt-primary); }
+      .text-primary { color: var(--dt-primary); }
+      .border-primary { border-color: var(--dt-primary); }
+      .ring-primary { --tw-ring-color: var(--dt-primary); }
+      .bg-primary-foreground { background-color: var(--dt-primary-foreground); }
+      .text-primary-foreground { color: var(--dt-primary-foreground); }
+      .border-primary-foreground { border-color: var(--dt-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--dt-primary-foreground); }
+      .bg-muted { background-color: var(--dt-muted); }
+      .text-muted { color: var(--dt-muted); }
+      .border-muted { border-color: var(--dt-muted); }
+      .ring-muted { --tw-ring-color: var(--dt-muted); }
+      .bg-muted-foreground { background-color: var(--dt-muted-foreground); }
+      .text-muted-foreground { color: var(--dt-muted-foreground); }
+      .border-muted-foreground { border-color: var(--dt-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--dt-muted-foreground); }
+      .bg-border { background-color: var(--dt-border); }
+      .text-border { color: var(--dt-border); }
+      .border-border { border-color: var(--dt-border); }
+      .ring-border { --tw-ring-color: var(--dt-border); }
+      .bg-input { background-color: var(--dt-input); }
+      .text-input { color: var(--dt-input); }
+      .border-input { border-color: var(--dt-input); }
+      .ring-input { --tw-ring-color: var(--dt-input); }
+      .bg-ring { background-color: var(--dt-ring); }
+      .text-ring { color: var(--dt-ring); }
+      .border-ring { border-color: var(--dt-ring); }
+      .ring-ring { --tw-ring-color: var(--dt-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen flex flex-col" style="background: var(--dt-background);">
+        <nav class="flex items-center justify-between px-6 py-4" style="background: var(--dt-card); border-bottom: 1px solid var(--dt-border);">
+            <button class="w-9 h-9 rounded-full flex items-center justify-center" style="background: var(--dt-muted);">
+                <i class="fa-solid fa-arrow-left text-sm" style="color: var(--dt-foreground);"></i>
+            </button>
+            <h1 class="text-lg font-semibold" style="color: var(--dt-foreground);">手写签名</h1>
+            <div class="w-9 h-9"></div>
+        </nav>
+
+        <div class="flex-1 flex items-start justify-center px-8 py-10">
+            <div class="w-full" style="max-width: 640px;">
+
+                <!-- Canvas Area -->
+                <div class="rounded-lg overflow-hidden" style="background: var(--dt-card); border: 1px solid var(--dt-border); box-shadow: var(--dt-shadow-sm);">
+                    <div class="flex items-center justify-between px-5 py-3" style="border-bottom: 1px solid var(--dt-border);">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs" style="color: var(--dt-muted-foreground);">笔触</span>
+                                <div class="flex gap-1">
+                                    <button class="w-6 h-6 rounded-full" style="background: var(--dt-foreground); border: 2px solid var(--dt-primary);"></button>
+                                    <button class="w-6 h-6 rounded-full" style="background: var(--dt-primary);"></button>
+                                    <button class="w-6 h-6 rounded-full" style="background: var(--dt-error);"></button>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs" style="color: var(--dt-muted-foreground);">粗细</span>
+                                <button class="w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--dt-muted); border: 1px solid var(--dt-border);">
+                                    <i class="fa-solid fa-minus text-xs" style="color: var(--dt-foreground);"></i>
+                                </button>
+                                <span class="text-xs font-medium" style="color: var(--dt-foreground);">3px</span>
+                                <button class="w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--dt-muted); border: 1px solid var(--dt-border);">
+                                    <i class="fa-solid fa-plus text-xs" style="color: var(--dt-foreground);"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium" style="background: var(--dt-muted); color: var(--dt-foreground);">
+                            <i class="fa-solid fa-eraser" style="font-size: 11px;"></i> 撤销
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-center" style="height: 320px; background: var(--dt-card); cursor: crosshair;">
+                        <svg width="400" height="100" viewBox="0 0 400 100">
+                            <path d="M 60 70 Q 100 20, 140 50 T 220 40 T 300 55 T 360 30" fill="none" stroke="var(--dt-foreground)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-center gap-3 mt-4">
+                    <button class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium" style="background: var(--dt-muted); color: var(--dt-foreground); border: 1px solid var(--dt-border);">
+                        <i class="fa-solid fa-trash-can text-xs"></i> 清除
+                    </button>
+                    <button class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium" style="background: var(--dt-primary); color: var(--dt-primary-foreground);">
+                        <i class="fa-solid fa-download text-xs"></i> 保存签名
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

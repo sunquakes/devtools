@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 格式化</title>
+    <style id="theme-vars">
+/* DevTools Redesign — Minimal Flat Light */
+:root {
+  /* Neutral palette */
+  --dt-background: #F8F9FC;
+  --dt-foreground: #1D1D1F;
+  --dt-card: #FFFFFF;
+  --dt-card-foreground: #1D1D1F;
+  --dt-popover: #FFFFFF;
+  --dt-popover-foreground: #1D1D1F;
+  --dt-muted: #F1F3F8;
+  --dt-muted-foreground: #86868B;
+  --dt-border: #E5E5EA;
+  --dt-input: #E8E8ED;
+  --dt-ring: #007AFF;
+
+  /* Primary */
+  --dt-primary: #007AFF;
+  --dt-primary-foreground: #FFFFFF;
+
+  /* Semantic states */
+  --dt-success: #34C759;
+  --dt-warning: #FF9500;
+  --dt-error: #FF3B30;
+  --dt-info: #007AFF;
+
+  /* Code block */
+  --dt-code-bg: #1E1E2E;
+  --dt-code-fg: #CDD6F4;
+
+  /* Radius scale */
+  --dt-radius-sm: 8px;
+  --dt-radius-md: 12px;
+  --dt-radius-lg: 16px;
+  --dt-radius-xl: 20px;
+
+  /* Depth / shadow */
+  --dt-shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --dt-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --dt-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+  /* Typography */
+  --dt-font-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --dt-font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--dt-background);
+    --color-foreground: var(--dt-foreground);
+    --color-card: var(--dt-card);
+    --color-card-foreground: var(--dt-card-foreground);
+    --color-popover: var(--dt-popover);
+    --color-popover-foreground: var(--dt-popover-foreground);
+    --color-primary: var(--dt-primary);
+    --color-primary-foreground: var(--dt-primary-foreground);
+    --color-muted: var(--dt-muted);
+    --color-muted-foreground: var(--dt-muted-foreground);
+    --color-border: var(--dt-border);
+    --color-input: var(--dt-input);
+    --color-ring: var(--dt-ring);
+    --radius-sm: var(--dt-radius-sm);
+    --radius-md: var(--dt-radius-md);
+    --radius-lg: var(--dt-radius-lg);
+    --radius-xl: var(--dt-radius-xl);
+  }
+  @layer base {
+    body { background: var(--dt-background); color: var(--dt-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--dt-background); }
+      .text-background { color: var(--dt-background); }
+      .border-background { border-color: var(--dt-background); }
+      .ring-background { --tw-ring-color: var(--dt-background); }
+      .bg-foreground { background-color: var(--dt-foreground); }
+      .text-foreground { color: var(--dt-foreground); }
+      .border-foreground { border-color: var(--dt-foreground); }
+      .ring-foreground { --tw-ring-color: var(--dt-foreground); }
+      .bg-card { background-color: var(--dt-card); }
+      .text-card { color: var(--dt-card); }
+      .border-card { border-color: var(--dt-card); }
+      .ring-card { --tw-ring-color: var(--dt-card); }
+      .bg-card-foreground { background-color: var(--dt-card-foreground); }
+      .text-card-foreground { color: var(--dt-card-foreground); }
+      .border-card-foreground { border-color: var(--dt-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--dt-card-foreground); }
+      .bg-popover { background-color: var(--dt-popover); }
+      .text-popover { color: var(--dt-popover); }
+      .border-popover { border-color: var(--dt-popover); }
+      .ring-popover { --tw-ring-color: var(--dt-popover); }
+      .bg-popover-foreground { background-color: var(--dt-popover-foreground); }
+      .text-popover-foreground { color: var(--dt-popover-foreground); }
+      .border-popover-foreground { border-color: var(--dt-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--dt-popover-foreground); }
+      .bg-primary { background-color: var(--dt-primary); }
+      .text-primary { color: var(--dt-primary); }
+      .border-primary { border-color: var(--dt-primary); }
+      .ring-primary { --tw-ring-color: var(--dt-primary); }
+      .bg-primary-foreground { background-color: var(--dt-primary-foreground); }
+      .text-primary-foreground { color: var(--dt-primary-foreground); }
+      .border-primary-foreground { border-color: var(--dt-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--dt-primary-foreground); }
+      .bg-muted { background-color: var(--dt-muted); }
+      .text-muted { color: var(--dt-muted); }
+      .border-muted { border-color: var(--dt-muted); }
+      .ring-muted { --tw-ring-color: var(--dt-muted); }
+      .bg-muted-foreground { background-color: var(--dt-muted-foreground); }
+      .text-muted-foreground { color: var(--dt-muted-foreground); }
+      .border-muted-foreground { border-color: var(--dt-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--dt-muted-foreground); }
+      .bg-border { background-color: var(--dt-border); }
+      .text-border { color: var(--dt-border); }
+      .border-border { border-color: var(--dt-border); }
+      .ring-border { --tw-ring-color: var(--dt-border); }
+      .bg-input { background-color: var(--dt-input); }
+      .text-input { color: var(--dt-input); }
+      .border-input { border-color: var(--dt-input); }
+      .ring-input { --tw-ring-color: var(--dt-input); }
+      .bg-ring { background-color: var(--dt-ring); }
+      .text-ring { color: var(--dt-ring); }
+      .border-ring { border-color: var(--dt-ring); }
+      .ring-ring { --tw-ring-color: var(--dt-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="flex flex-col h-screen" data-viewport-mode="app-shell" style="background:var(--dt-background); font-family:var(--dt-font-sans);">
+
+      <!-- Navigation Bar -->
+      <nav class="flex items-center justify-between px-6 py-4 shrink-0" style="background:var(--dt-card); border-bottom:1px solid var(--dt-border);">
+        <button class="flex items-center justify-center rounded-full" style="width:36px;height:36px;background:var(--dt-muted);">
+          <i class="fa-solid fa-arrow-left" style="font-size:14px; color:var(--dt-foreground);"></i>
+        </button>
+        <span class="select-none" style="font-size:18px; font-weight:600; color:var(--dt-foreground);">JSON 格式化</span>
+        <div style="width:36px;"></div>
+      </nav>
+
+      <!-- Toolbar -->
+      <div class="flex items-center gap-2 px-6 py-2.5 shrink-0" style="background:var(--dt-card); border-bottom:1px solid var(--dt-border);">
+        <button class="flex items-center gap-1.5 cursor-pointer" style="background:var(--dt-primary); color:var(--dt-primary-foreground); border-radius:var(--dt-radius-sm); font-size:13px; font-weight:500; padding:6px 12px; border:none;">
+          <i class="fa-solid fa-code" style="font-size:12px;"></i>
+          <span>格式化</span>
+        </button>
+        <button class="flex items-center gap-1.5 cursor-pointer" style="background:var(--dt-muted); color:var(--dt-muted-foreground); border-radius:var(--dt-radius-sm); font-size:13px; font-weight:500; padding:6px 12px; border:none;">
+          <i class="fa-solid fa-compress" style="font-size:12px;"></i>
+          <span>压缩</span>
+        </button>
+        <button class="flex items-center gap-1.5 cursor-pointer" style="background:var(--dt-muted); color:var(--dt-muted-foreground); border-radius:var(--dt-radius-sm); font-size:13px; font-weight:500; padding:6px 12px; border:none;">
+          <i class="fa-solid fa-chevron-down" style="font-size:12px;"></i>
+          <span>展开</span>
+        </button>
+        <button class="flex items-center gap-1.5 cursor-pointer" style="background:var(--dt-muted); color:var(--dt-muted-foreground); border-radius:var(--dt-radius-sm); font-size:13px; font-weight:500; padding:6px 12px; border:none;">
+          <i class="fa-solid fa-chevron-up" style="font-size:12px;"></i>
+          <span>折叠</span>
+        </button>
+        <button class="flex items-center gap-1.5 cursor-pointer" style="background:var(--dt-muted); color:var(--dt-muted-foreground); border-radius:var(--dt-radius-sm); font-size:13px; font-weight:500; padding:6px 12px; border:none;">
+          <i class="fa-solid fa-clipboard" style="font-size:12px;"></i>
+          <span>复制</span>
+        </button>
+        <button class="flex items-center gap-1.5 cursor-pointer" style="background:var(--dt-muted); color:var(--dt-muted-foreground); border-radius:var(--dt-radius-sm); font-size:13px; font-weight:500; padding:6px 12px; border:none;">
+          <i class="fa-solid fa-download" style="font-size:12px;"></i>
+          <span>下载</span>
+        </button>
+      </div>
+
+      <!-- Split Panel Layout -->
+      <div class="flex flex-1 gap-3 p-4 overflow-hidden min-h-0">
+
+        <!-- Left Panel: Input -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="select-none" style="font-size:14px; font-weight:500; color:var(--dt-foreground);">输入</span>
+          </div>
+          <div class="flex-1 overflow-auto" style="background:var(--dt-code-bg); border-radius:var(--dt-radius-lg); box-shadow:var(--dt-shadow-sm); padding:16px;">
+            <pre class="leading-relaxed" style="font-family:var(--dt-font-mono); font-size:12px; color:var(--dt-code-fg); margin:0; white-space:pre-wrap; word-break:break-all;">{"name":"DevTools","version":"2.1.0","description":"A comprehensive developer toolkit","features":["JSON Format","Base64 Encode/Decode","MD5 Hash","QR Code Generator","Timestamp Converter"],"author":{"name":"Rui","email":"dev@example.com","website":"https://devtools.example.com"},"config":{"theme":"light","language":"zh-CN","autoUpdate":true,"maxHistory":100},"stats":{"downloads":150000,"rating":4.8,"contributors":12}}</pre>
+          </div>
+        </div>
+
+        <!-- Right Panel: Output -->
+        <div class="flex-1 flex flex-col min-w-0">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="select-none" style="font-size:14px; font-weight:500; color:var(--dt-foreground);">输出</span>
+          </div>
+          <div class="flex-1 overflow-auto" style="background:var(--dt-card); border:1px solid var(--dt-border); border-radius:var(--dt-radius-lg); box-shadow:var(--dt-shadow-sm); padding:16px;">
+            <pre class="leading-relaxed" style="font-family:var(--dt-font-mono); font-size:12px; margin:0;"><span class="syn-punct">{</span>
+  <span class="syn-key">"name"</span><span class="syn-punct">:</span> <span class="syn-str">"DevTools"</span><span class="syn-punct">,</span>
+  <span class="syn-key">"version"</span><span class="syn-punct">:</span> <span class="syn-str">"2.1.0"</span><span class="syn-punct">,</span>
+  <span class="syn-key">"description"</span><span class="syn-punct">:</span> <span class="syn-str">"A comprehensive developer toolkit"</span><span class="syn-punct">,</span>
+  <span class="syn-key">"features"</span><span class="syn-punct">:</span> <span class="syn-punct">[</span>
+    <span class="syn-str">"JSON Format"</span><span class="syn-punct">,</span>
+    <span class="syn-str">"Base64 Encode/Decode"</span><span class="syn-punct">,</span>
+    <span class="syn-str">"MD5 Hash"</span><span class="syn-punct">,</span>
+    <span class="syn-str">"QR Code Generator"</span><span class="syn-punct">,</span>
+    <span class="syn-str">"Timestamp Converter"</span>
+  <span class="syn-punct">],</span>
+  <span class="syn-key">"author"</span><span class="syn-punct">:</span> <span class="syn-punct">{</span>
+    <span class="syn-key">"name"</span><span class="syn-punct">:</span> <span class="syn-str">"Rui"</span><span class="syn-punct">,</span>
+    <span class="syn-key">"email"</span><span class="syn-punct">:</span> <span class="syn-str">"dev@example.com"</span><span class="syn-punct">,</span>
+    <span class="syn-key">"website"</span><span class="syn-punct">:</span> <span class="syn-str">"https://devtools.example.com"</span>
+  <span class="syn-punct">},</span>
+  <span class="syn-key">"config"</span><span class="syn-punct">:</span> <span class="syn-punct">{</span>
+    <span class="syn-key">"theme"</span><span class="syn-punct">:</span> <span class="syn-str">"light"</span><span class="syn-punct">,</span>
+    <span class="syn-key">"language"</span><span class="syn-punct">:</span> <span class="syn-str">"zh-CN"</span><span class="syn-punct">,</span>
+    <span class="syn-key">"autoUpdate"</span><span class="syn-punct">:</span> <span class="syn-num">true</span><span class="syn-punct">,</span>
+    <span class="syn-key">"maxHistory"</span><span class="syn-punct">:</span> <span class="syn-num">100</span>
+  <span class="syn-punct">},</span>
+  <span class="syn-key">"stats"</span><span class="syn-punct">:</span> <span class="syn-punct">{</span>
+    <span class="syn-key">"downloads"</span><span class="syn-punct">:</span> <span class="syn-num">150000</span><span class="syn-punct">,</span>
+    <span class="syn-key">"rating"</span><span class="syn-punct">:</span> <span class="syn-num">4.8</span><span class="syn-punct">,</span>
+    <span class="syn-key">"contributors"</span><span class="syn-punct">:</span> <span class="syn-num">12</span>
+  <span class="syn-punct">}</span>
+<span class="syn-punct">}</span></pre>
+          </div>
+        </div>
+
+      </div>
+    </main>
+    <style>
+      .syn-punct { color: var(--dt-muted-foreground); }
+      .syn-str { color: var(--dt-success); }
+      .syn-key { color: var(--dt-primary); }
+      .syn-num { color: var(--dt-warning); }
+    </style>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

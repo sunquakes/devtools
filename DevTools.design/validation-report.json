@@ -1,0 +1,651 @@
+{
+  "success": false,
+  "outcome": "validation_failed",
+  "repairable": true,
+  "terminalViolations": [],
+  "terminalBlockingSummary": null,
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.07.22.00.00.00",
+    "version_source": "skill-release-manifest.json",
+    "runtime_skill_dir": "c:\\Users\\RuiXinglong\\.trae-cn\\builtin\\design\\default\\skills\\solo-design",
+    "recorded_at": null,
+    "expected_version": "2026.07.22.00.00.00",
+    "status": "manifest_fallback",
+    "read_status": "ok",
+    "reason": "runtime-orchestration-summary.json missing skillProvenance; used skill-release-manifest.json"
+  },
+  "operatingMode": "free-explore",
+  "renderBlockingErrorCount": 15,
+  "softWarningCount": 7,
+  "renderBlockingErrors": [
+    "[html-infrastructure] [MAIN-AGENT] data-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] home.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] home.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] home.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] image-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] query-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head"
+  ],
+  "errorSignatures": [
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "signature": "d06e34c91081df30fa334eb94dd509606dec7d974ad8516865e1012897ca8657"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "signature": "08e940b40ed1ea85ad48bfff897313548e52b26529058d3f597c524c539a7d33"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "signature": "d3645f36a14a60301aea2071acfba142969e4031fa2f7265121ad91e0bec7db0"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "signature": "273a06e94082ef7d4971eed6d6fedfb407b28443b98dbb7458b44eec0f8038d5"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "signature": "b05b09ecd4445613420118f14b9f810c08cf2822c36816d12bd03d09a8754401"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "signature": "54c7f974b0fdcf873f313ce54264086df772095258389cd7c7692266b478c097"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] home.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "signature": "8ac27d05cebd74ed9adfeb2f001156368c49b219c962e1ef62ba1c62be0ccd62"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] home.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "signature": "f726f3a33e458e348333effd295ee04219082243699c39d9bfa1e8bbecce8d2e"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] home.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "signature": "1a1bf5845140b9a26adbe8df9c1fe356fc9f3b6fb0829cc6f027d2a5340ee4b9"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "signature": "1a74ef5c8e9d2fff9e4ab0d75d7170ab522ee1023e57308fd99e87a26ffd1f78"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "signature": "8e28cb15f81d4b5451dbc2d971c468e65845d96e663f3ea58aa1bd912b0ec2d5"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "signature": "63f07321a713e27907773b3354237dc6f7eb0d47555f128e15f5f483a1223d67"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "signature": "7c3c6b957723951da88fc9f565411693ba090b48f335511767e853e63059705b"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "signature": "5326c9925f4516b0d2f60bb80981a2cdb88f9b3ad5e644ec3f9233a30aa63dbb"
+    },
+    {
+      "errorClass": "head-infrastructure",
+      "normalized": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "signature": "38f51da72d8db4c5d6ff34f70c4660361ed4371d0c1cfc864f1dffad6b092013"
+    }
+  ],
+  "softWarnings": [
+    "[html-head-style] data-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] encoding-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] home.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] image-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] query-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-quality] colors_and_type.css: free-explore radius tokens must stay within the restrained 2/4/8/12/16px scale; oversized or forbidden radius tokens found (--dt-radius-xl: 20px). Do not use 20px+ radii unless the user explicitly requested large rounded shapes.",
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--dt-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), --dt-shadow-md: 0 4px 12px rgba(0,0,0,0.08), --dt-shadow-lg: 0 8px 24px rgba(0,0,0,0.12))."
+  ],
+  "repairPlanHints": [
+    {
+      "errorClass": "head-infrastructure-missing",
+      "owner": "main-agent",
+      "repairScope": "affected-page-head",
+      "strategy": "run_apply_html_head_replace",
+      "affectedFiles": [
+        "data-tools.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "head-infrastructure-missing",
+      "owner": "main-agent",
+      "repairScope": "affected-page-head",
+      "strategy": "run_apply_html_head_replace",
+      "affectedFiles": [
+        "encoding-tools.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "head-infrastructure-missing",
+      "owner": "main-agent",
+      "repairScope": "affected-page-head",
+      "strategy": "run_apply_html_head_replace",
+      "affectedFiles": [
+        "home.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "head-infrastructure-missing",
+      "owner": "main-agent",
+      "repairScope": "affected-page-head",
+      "strategy": "run_apply_html_head_replace",
+      "affectedFiles": [
+        "image-tools.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "head-infrastructure-missing",
+      "owner": "main-agent",
+      "repairScope": "affected-page-head",
+      "strategy": "run_apply_html_head_replace",
+      "affectedFiles": [
+        "query-tools.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    }
+  ],
+  "repairActionTable": [
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] home.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] home.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] home.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    }
+  ],
+  "errorCount": 15,
+  "warningCount": 7,
+  "errors": [
+    "[html-infrastructure] [MAIN-AGENT] data-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] home.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] home.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] home.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] image-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] query-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+    "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head"
+  ],
+  "warnings": [
+    "[html-head-style] data-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] encoding-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] home.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] image-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-head-style] query-tools.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[html-quality] colors_and_type.css: free-explore radius tokens must stay within the restrained 2/4/8/12/16px scale; oversized or forbidden radius tokens found (--dt-radius-xl: 20px). Do not use 20px+ radii unless the user explicitly requested large rounded shapes.",
+    "[html-quality] colors_and_type.css: ordinary/static shadow tokens must keep every shadow alpha <= 0.05; deeper shadows are allowed only for floating-layer tokens such as modal/popover/dropdown/drawer/overlay (--dt-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), --dt-shadow-md: 0 4px 12px rgba(0,0,0,0.08), --dt-shadow-lg: 0 8px 24px rgba(0,0,0,0.12))."
+  ],
+  "validationRunDisciplineStatus": {
+    "declared": false,
+    "restoreMode": false,
+    "maxFullValidationRuns": null,
+    "validationHistoryCount": 0,
+    "repairLedgerCount": 0,
+    "softWarningsTriggerRepair": null,
+    "terminalState": null,
+    "nextAction": null,
+    "violations": [],
+    "success": true
+  },
+  "terminalState": null,
+  "nextCheck": {
+    "type": "full",
+    "command": "node \"c:\\Users\\RuiXinglong\\.trae-cn\\builtin\\design\\default\\skills\\solo-design\\shared-runtime\\deterministic-tooling\\validate-design-workspace.mjs\" \"c:\\Users\\RuiXinglong\\Documents\\GitHub\\devtools\\DevTools.design\" --report-json=\"c:\\Users\\RuiXinglong\\Documents\\GitHub\\devtools\\DevTools.design\\validation-report.json\"",
+    "fullValidationAllowed": true,
+    "reason": "no narrower deterministic targeted check is available for the current failure class"
+  },
+  "repairBatch": [
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] home.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] home.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] home.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    },
+    {
+      "error": "[html-infrastructure] [MAIN-AGENT] query-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> query-tools.html --replace-head",
+      "errorClass": "head-infrastructure",
+      "severity": "blocking",
+      "action": "run_apply_html_head_replace_once",
+      "owner": "main-agent",
+      "sourceReadPolicy": "no-validator-source-read"
+    }
+  ],
+  "repairContextPacket": {
+    "schema_version": "1.0",
+    "purpose": "small-context repair packet; read this before full validation-report.json",
+    "success": false,
+    "terminalState": null,
+    "skillProvenance": {
+      "name": "solo-design",
+      "version": "2026.07.22.00.00.00",
+      "version_source": "skill-release-manifest.json",
+      "runtime_skill_dir": "c:\\Users\\RuiXinglong\\.trae-cn\\builtin\\design\\default\\skills\\solo-design",
+      "recorded_at": null,
+      "expected_version": "2026.07.22.00.00.00",
+      "status": "manifest_fallback",
+      "read_status": "ok",
+      "reason": "runtime-orchestration-summary.json missing skillProvenance; used skill-release-manifest.json"
+    },
+    "renderBlockingErrorCount": 15,
+    "softWarningCount": 7,
+    "renderBlockingErrors": [
+      "[html-infrastructure] [MAIN-AGENT] data-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] data-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> data-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] encoding-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> encoding-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] home.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] home.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] home.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> home.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] image-tools.html missing Tailwind CSS CDN (<script src=\"...@tailwindcss/browser@4\">). Impact: all utility classes stop working; page degrades to unstyled HTML. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @theme inline Tailwind <-> CSS variable bridge block. Impact: bg-primary, text-foreground and similar classes cannot map to theme colors. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head",
+      "[html-infrastructure] [MAIN-AGENT] image-tools.html missing @layer base global base styles. Impact: body background color, font, table word-break and other base styles are lost. Fix: run apply-html-head-contract.mjs <css-path> image-tools.html --replace-head"
+    ],
+    "repairActionTable": [
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      },
+      {
+        "errorClass": "head-infrastructure",
+        "owner": "main-agent",
+        "severity": "blocking",
+        "action": "run_apply_html_head_replace_once",
+        "affectedFiles": [],
+        "sourceReadPolicy": "no-validator-source-read"
+      }
+    ],
+    "nextCheck": {
+      "type": "full",
+      "command": "node \"c:\\Users\\RuiXinglong\\.trae-cn\\builtin\\design\\default\\skills\\solo-design\\shared-runtime\\deterministic-tooling\\validate-design-workspace.mjs\" \"c:\\Users\\RuiXinglong\\Documents\\GitHub\\devtools\\DevTools.design\" --report-json=\"c:\\Users\\RuiXinglong\\Documents\\GitHub\\devtools\\DevTools.design\\validation-report.json\"",
+      "fullValidationAllowed": true,
+      "reason": "no narrower deterministic targeted check is available for the current failure class"
+    },
+    "forbidden": [
+      "do not read validator source",
+      "do not rerun full validation when nextCheck.fullValidationAllowed=false",
+      "do not start preview/browser unless user explicitly asks",
+      "do not hand-edit repair ledger fields"
+    ]
+  },
+  "projectFileHashes": {
+    "DevTools.design": "0f8c958a302510b8c504e191d3d54949f89a338d4f51046689e05de079868db4",
+    "colors_and_type.css": "27741b2a7734423602133c819b9bbd48c10f149df7c4fb0d4c79eabb8e7c6c40",
+    "pages/barcode.html": "0229cfaaf6b1df30020377486d4e99dcd44f418570de34e6990e5ede5915253c",
+    "pages/base64-to-image.html": "4d6a91ddf85c3a26eb908977144ebacd44b5c2d7b49c331f149ac19b9e69ddfa",
+    "pages/data-tools.html": "e0cc2fccce80b5ad38427692424952e2b3510f3469325a493d7041bac7b8b4b1",
+    "pages/district-code.html": "0b1b20cb20f8688ed3f2c0229b99a1a60e7c087d4970c6e99feb4dced87037ad",
+    "pages/encoding-tools.html": "3d1e9453ca3f4f7c4764bce2905c6fbd35456c8877ffea14a5ba9a0adb125733",
+    "pages/home.html": "d8bf360d4933ce8aa77e42bab51e367a8dfb81c11d5dbfda7655b261e4a81e7a",
+    "pages/image-to-base64.html": "54cd8cc31004449655c10c0e0c0da334d1d401290583d55dca6775cda9ed9c97",
+    "pages/image-tools.html": "be9fc7f5fee1e7d22c11305326100b37a4409868e1a3ae1ebf88d5fd1d81d1b9",
+    "pages/json-format.html": "abaee70d3143956aa83a131c4a241613c3308ad132291c4630f84101f635bcbb",
+    "pages/md5.html": "538d3144d92d93fd4835d877357f4b0cf5b1bc3e642b479e8cc663c9dfd27df9",
+    "pages/qr-barcode-decode.html": "5f9f645843444821428d82581226eff9ced8ab975d1156c0d7ea02fc281720e5",
+    "pages/qrcode.html": "b01c071db6567afc5183eb08b495c6ca43fab72b328d710e3286b9641bc16fcd",
+    "pages/query-tools.html": "3bfb97f6887fcb1f0403b49593cee4cc1c992947eeb6f726995f5c8ce0fced92",
+    "pages/random-string.html": "2a61441952b58a0820b46aeeaa82490b55020277366370ff3604c57c6825b55c",
+    "pages/signature.html": "346cb393e4037ea1b5ed5d68d43cc9e859ae31c976d2bf49e48f752482a696cc",
+    "pages/string-escape.html": "99411b230a2342944104e2c4246786f8fc85bc69e2d7faf5ddb595a9055c2b55",
+    "pages/timestamp.html": "5156fe7d30879d375fed66cb183f8024fb726133cbe731afebef32ba9e245472",
+    "pages/url-encode.html": "d6935fcd37225c60584809333bdb6b37485ea855ca3319c6642380a295eeae05"
+  },
+  "designDir": "c:\\Users\\RuiXinglong\\Documents\\GitHub\\devtools\\DevTools.design",
+  "expectedPages": null,
+  "requireInteractions": null,
+  "checkedAt": "2026-07-26T14:30:26.419Z"
+}

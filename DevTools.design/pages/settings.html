@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置</title>
+    <style id="theme-vars">
+/* DevTools Redesign — Minimal Flat Light */
+:root {
+  /* Neutral palette */
+  --dt-background: #F8F9FC;
+  --dt-foreground: #1D1D1F;
+  --dt-card: #FFFFFF;
+  --dt-card-foreground: #1D1D1F;
+  --dt-popover: #FFFFFF;
+  --dt-popover-foreground: #1D1D1F;
+  --dt-muted: #F1F3F8;
+  --dt-muted-foreground: #86868B;
+  --dt-border: #E5E5EA;
+  --dt-input: #E8E8ED;
+  --dt-ring: #007AFF;
+
+  /* Primary */
+  --dt-primary: #007AFF;
+  --dt-primary-foreground: #FFFFFF;
+
+  /* Semantic states */
+  --dt-success: #34C759;
+  --dt-warning: #FF9500;
+  --dt-error: #FF3B30;
+  --dt-info: #007AFF;
+
+  /* Radius scale */
+  --dt-radius-sm: 8px;
+  --dt-radius-md: 12px;
+  --dt-radius-lg: 16px;
+  --dt-radius-xl: 20px;
+
+  /* Depth / shadow */
+  --dt-shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --dt-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --dt-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+
+  /* Typography */
+  --dt-font-sans: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --dt-font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--dt-background);
+    --color-foreground: var(--dt-foreground);
+    --color-card: var(--dt-card);
+    --color-card-foreground: var(--dt-card-foreground);
+    --color-popover: var(--dt-popover);
+    --color-popover-foreground: var(--dt-popover-foreground);
+    --color-primary: var(--dt-primary);
+    --color-primary-foreground: var(--dt-primary-foreground);
+    --color-muted: var(--dt-muted);
+    --color-muted-foreground: var(--dt-muted-foreground);
+    --color-border: var(--dt-border);
+    --color-input: var(--dt-input);
+    --color-ring: var(--dt-ring);
+    --radius-sm: var(--dt-radius-sm);
+    --radius-md: var(--dt-radius-md);
+    --radius-lg: var(--dt-radius-lg);
+    --radius-xl: var(--dt-radius-xl);
+  }
+  @layer base {
+    body { background: var(--dt-background); color: var(--dt-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--dt-background); }
+      .text-background { color: var(--dt-background); }
+      .border-background { border-color: var(--dt-background); }
+      .ring-background { --tw-ring-color: var(--dt-background); }
+      .bg-foreground { background-color: var(--dt-foreground); }
+      .text-foreground { color: var(--dt-foreground); }
+      .border-foreground { border-color: var(--dt-foreground); }
+      .ring-foreground { --tw-ring-color: var(--dt-foreground); }
+      .bg-card { background-color: var(--dt-card); }
+      .text-card { color: var(--dt-card); }
+      .border-card { border-color: var(--dt-card); }
+      .ring-card { --tw-ring-color: var(--dt-card); }
+      .bg-card-foreground { background-color: var(--dt-card-foreground); }
+      .text-card-foreground { color: var(--dt-card-foreground); }
+      .border-card-foreground { border-color: var(--dt-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--dt-card-foreground); }
+      .bg-popover { background-color: var(--dt-popover); }
+      .text-popover { color: var(--dt-popover); }
+      .border-popover { border-color: var(--dt-popover); }
+      .ring-popover { --tw-ring-color: var(--dt-popover); }
+      .bg-popover-foreground { background-color: var(--dt-popover-foreground); }
+      .text-popover-foreground { color: var(--dt-popover-foreground); }
+      .border-popover-foreground { border-color: var(--dt-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--dt-popover-foreground); }
+      .bg-primary { background-color: var(--dt-primary); }
+      .text-primary { color: var(--dt-primary); }
+      .border-primary { border-color: var(--dt-primary); }
+      .ring-primary { --tw-ring-color: var(--dt-primary); }
+      .bg-primary-foreground { background-color: var(--dt-primary-foreground); }
+      .text-primary-foreground { color: var(--dt-primary-foreground); }
+      .border-primary-foreground { border-color: var(--dt-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--dt-primary-foreground); }
+      .bg-muted { background-color: var(--dt-muted); }
+      .text-muted { color: var(--dt-muted); }
+      .border-muted { border-color: var(--dt-muted); }
+      .ring-muted { --tw-ring-color: var(--dt-muted); }
+      .bg-muted-foreground { background-color: var(--dt-muted-foreground); }
+      .text-muted-foreground { color: var(--dt-muted-foreground); }
+      .border-muted-foreground { border-color: var(--dt-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--dt-muted-foreground); }
+      .bg-border { background-color: var(--dt-border); }
+      .text-border { color: var(--dt-border); }
+      .border-border { border-color: var(--dt-border); }
+      .ring-border { --tw-ring-color: var(--dt-border); }
+      .bg-input { background-color: var(--dt-input); }
+      .text-input { color: var(--dt-input); }
+      .border-input { border-color: var(--dt-input); }
+      .ring-input { --tw-ring-color: var(--dt-input); }
+      .bg-ring { background-color: var(--dt-ring); }
+      .text-ring { color: var(--dt-ring); }
+      .border-ring { border-color: var(--dt-ring); }
+      .ring-ring { --tw-ring-color: var(--dt-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      /* Toggle switch */
+      .toggle {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        border-radius: 9999px;
+        background: var(--dt-input);
+        border: 1px solid var(--dt-border);
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        flex-shrink: 0;
+      }
+      .toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--dt-card);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        transition: transform 0.2s ease;
+      }
+      .toggle.on {
+        background: var(--dt-primary);
+        border-color: var(--dt-primary);
+      }
+      .toggle.on::after {
+        transform: translateX(20px);
+      }
+      /* Language select */
+      .lang-select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+        border: none;
+        font-size: 14px;
+        color: var(--dt-foreground);
+        cursor: pointer;
+        padding-right: 20px;
+        outline: none;
+        font-family: var(--dt-font-sans);
+      }
+      .lang-select-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+      }
+      .lang-select-wrap::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 10px;
+        color: var(--dt-muted-foreground);
+        position: absolute;
+        right: 4px;
+        pointer-events: none;
+      }
+      /* Hotkey input */
+      .hotkey-input {
+        width: 120px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-family: var(--dt-font-mono);
+        background: var(--dt-card);
+        border: 1px solid var(--dt-border);
+        border-radius: var(--dt-radius-sm);
+        color: var(--dt-foreground);
+        outline: none;
+        text-align: center;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      .hotkey-input:focus {
+        border-color: var(--dt-ring);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+      }
+      .hotkey-input::placeholder {
+        color: var(--dt-muted-foreground);
+        font-family: var(--dt-font-sans);
+        font-size: 13px;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen flex flex-col" style="background: var(--dt-background);">
+        <!-- Navigation Bar -->
+        <nav class="flex items-center justify-between px-6 py-4" style="background: var(--dt-card); border-bottom: 1px solid var(--dt-border);">
+            <button class="w-9 h-9 rounded-full flex items-center justify-center" style="background: var(--dt-muted);">
+                <i class="fa-solid fa-arrow-left text-sm" style="color: var(--dt-foreground);"></i>
+            </button>
+            <h1 class="text-lg font-semibold" style="color: var(--dt-foreground);">设置</h1>
+            <div class="w-9 h-9"></div>
+        </nav>
+
+        <!-- Settings Content -->
+        <div class="flex-1 flex items-start justify-center px-8 py-8">
+            <div class="flex flex-col gap-4 w-full" style="max-width: 560px;">
+
+                <!-- Section Label -->
+                <label class="text-xs font-medium tracking-widest uppercase" style="color: var(--dt-muted-foreground);">通用</label>
+
+                <!-- Setting Row 1: 开机自启 -->
+                <div class="flex items-center justify-between gap-3 rounded-md p-4" style="background: var(--dt-card); border: 1px solid var(--dt-border); box-shadow: var(--dt-shadow-sm);">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="flex items-center justify-center flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; background: var(--dt-muted);">
+                            <i class="fa-solid fa-power-off" style="font-size: 14px; color: var(--dt-muted-foreground);"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm" style="color: var(--dt-foreground);">开机自启</div>
+                            <div class="text-xs mt-1" style="color: var(--dt-muted-foreground);">系统启动时自动运行</div>
+                        </div>
+                    </div>
+                    <div class="toggle"></div>
+                </div>
+
+                <!-- Setting Row 2: 语言 -->
+                <div class="flex items-center justify-between gap-3 rounded-md p-4" style="background: var(--dt-card); border: 1px solid var(--dt-border); box-shadow: var(--dt-shadow-sm);">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="flex items-center justify-center flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(0,122,255,0.08);">
+                            <i class="fa-solid fa-globe" style="font-size: 14px; color: var(--dt-primary);"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm" style="color: var(--dt-foreground);">语言</div>
+                            <div class="text-xs mt-1" style="color: var(--dt-muted-foreground);">界面显示语言</div>
+                        </div>
+                    </div>
+                    <div class="lang-select-wrap">
+                        <select class="lang-select">
+                            <option value="zh-CN" selected>中文</option>
+                            <option value="en-US">English</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Setting Row 3: 托盘显示/隐藏窗口 -->
+                <div class="flex flex-col gap-3 rounded-md p-4" style="background: var(--dt-card); border: 1px solid var(--dt-border); box-shadow: var(--dt-shadow-sm);">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div class="flex items-center justify-center flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; background: var(--dt-muted);">
+                                <i class="fa-solid fa-keyboard" style="font-size: 14px; color: var(--dt-muted-foreground);"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm" style="color: var(--dt-foreground);">托盘显示/隐藏窗口</div>
+                                <div class="text-xs mt-1" style="color: var(--dt-muted-foreground);">通过快捷键快速切换窗口可见性</div>
+                            </div>
+                        </div>
+                        <div class="toggle on"></div>
+                    </div>
+                    <!-- Hotkey input row -->
+                    <div class="flex items-center gap-3 pt-3" style="border-top: 1px solid var(--dt-border);">
+                        <label class="text-xs font-medium" style="color: var(--dt-muted-foreground); white-space: nowrap;">快捷键</label>
+                        <input type="text" class="hotkey-input" placeholder="按住组合键..." readonly value="Ctrl+Shift+D" />
+                        <button class="text-xs font-medium" style="color: var(--dt-primary); cursor: pointer; white-space: nowrap;">清除</button>
+                    </div>
+                </div>
+
+                <!-- Section Label: 关于 -->
+                <label class="text-xs font-medium tracking-widest uppercase mt-4" style="color: var(--dt-muted-foreground);">关于</label>
+
+                <!-- About Row -->
+                <div class="flex items-center gap-3 rounded-md p-4" style="background: var(--dt-card); border: 1px solid var(--dt-border); box-shadow: var(--dt-shadow-sm);">
+                    <div class="flex items-center justify-center flex-shrink-0" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(0,122,255,0.08);">
+                        <i class="fa-solid fa-circle-info" style="font-size: 14px; color: var(--dt-primary);"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm" style="color: var(--dt-foreground);">开发者工具</div>
+                        <div class="text-xs mt-1" style="color: var(--dt-muted-foreground);">版本 1.0.0</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

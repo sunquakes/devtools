@@ -1,0 +1,314 @@
+{
+  "data": [
+    {
+      "id": "page-home",
+      "title": "首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/home.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-encoding-tools",
+      "title": "编码工具",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954080000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/encoding-tools.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-image-tools",
+      "title": "图片工具",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954010000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/image-tools.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-data-tools",
+      "title": "数据处理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954060000,
+      "canvasData": {
+        "x": 1860,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/data-tools.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-query-tools",
+      "title": "查询工具",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954070000,
+      "canvasData": {
+        "x": 2484,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/query-tools.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-url-encode",
+      "title": "URL编码解码",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954090000,
+      "canvasData": {
+        "x": 3100,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/url-encode.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-string-escape",
+      "title": "字符串转义",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954100000,
+      "canvasData": {
+        "x": 3720,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/string-escape.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-random-string",
+      "title": "随机字符串生成",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954110000,
+      "canvasData": {
+        "x": 4340,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/random-string.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-md5",
+      "title": "MD5",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954020000,
+      "canvasData": {
+        "x": 4960,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/md5.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-timestamp",
+      "title": "时间戳",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954030000,
+      "canvasData": {
+        "x": 5580,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/timestamp.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-qrcode",
+      "title": "二维码",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954040000,
+      "canvasData": {
+        "x": 6200,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/qrcode.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-barcode",
+      "title": "条形码",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954120000,
+      "canvasData": {
+        "x": 6820,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/barcode.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-base64-to-image",
+      "title": "Base64转图片",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954130000,
+      "canvasData": {
+        "x": 7440,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/base64-to-image.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-image-to-base64",
+      "title": "图片转Base64",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954140000,
+      "canvasData": {
+        "x": 8060,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/image-to-base64.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-signature",
+      "title": "手写签名",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954150000,
+      "canvasData": {
+        "x": 8680,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/signature.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-qr-barcode-decode",
+      "title": "二维码/条形码识别",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954160000,
+      "canvasData": {
+        "x": 9300,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/qr-barcode-decode.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-json-format",
+      "title": "JSON格式化",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954050000,
+      "canvasData": {
+        "x": 9920,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/json-format.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-district-code",
+      "title": "行政编码查询",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954170000,
+      "canvasData": {
+        "x": 10540,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/district-code.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-settings",
+      "title": "设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1784954180000,
+      "canvasData": {
+        "x": 11160,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/settings.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": false,
+    "deviceType": "desktop",
+    "projectName": "开发者工具样式重设计（配色统一版）",
+    "visualEditorEnabled": false
+  }
+}
